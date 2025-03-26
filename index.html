@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BizNet Connect</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script>
+    function navigateTo(section) {
+      document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f7fafd;
+      color: #1a1a1a;
+    }
+    nav {
+      background-color: #ffffff;
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #2196f3;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li {
+      cursor: pointer;
+      font-weight: 600;
+    }
+    nav ul li:hover {
+      color: #1c82d6;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem;
+    }
+    .hero {
+      background: linear-gradient(135deg, #cfe9ff, #eaf4ff);
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .cta-button {
+      background-color: #2196f3;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #1c82d6;
+    }
+    .features, .services, .app-preview, .pricing, .about, .contact {
+      background-color: white;
+      padding: 4rem 2rem;
+    }
+    .feature-grid, .service-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .feature, .service {
+      flex: 1;
+      min-width: 250px;
+      background-color: #f0f8ff;
+      padding: 2rem;
+      border-radius: 10px;
+    }
+    .app-image {
+      max-width: 300px;
+      margin-top: 2rem;
+    }
+    .pricing-cards {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .card {
+      background-color: #f0f8ff;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 280px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .featured {
+      border: 2px solid #2196f3;
+    }
+    .price {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 1rem 0;
+    }
+    .footer {
+      background-color: #eaf4ff;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">BizNet Connect</div>
+    <ul>
+      <li onclick="navigateTo('features')">Features</li>
+      <li onclick="navigateTo('services')">Services</li>
+      <li onclick="navigateTo('about')">About</li>
+      <li onclick="navigateTo('pricing')">Pricing</li>
+      <li onclick="navigateTo('contact')">Contact</li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <h1>Where Business Owners Thrive Together</h1>
+      <p>Connect. Collaborate. Scale.</p>
+      <a href="#pricing" class="cta-button">Join the Network</a>
+    </div>
+  </header>
+
+  <section id="features" class="features">
+    <div class="container">
+      <h2>Why BizNet Connect?</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>Targeted Networking</h3>
+          <p>Find professionals by niche — from finance to branding.</p>
+        </div>
+        <div class="feature">
+          <h3>Growth-Focused</h3>
+          <p>Gain access to resources, mentors, and marketing experts.</p>
+        </div>
+        <div class="feature">
+          <h3>Verified Community</h3>
+          <p>Each member is pre-vetted to ensure credibility.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" class="services">
+    <div class="container">
+      <h2>Services Available in the Network</h2>
+      <div class="service-grid">
+        <div class="service"><h4>Accounting & Bookkeeping</h4></div>
+        <div class="service"><h4>Legal Consultation</h4></div>
+        <div class="service"><h4>Business Funding</h4></div>
+        <div class="service"><h4>SEO / PPC / Ads</h4></div>
+        <div class="service"><h4>Web Design & Development</h4></div>
+        <div class="service"><h4>CRM & Automation</h4></div>
+        <div class="service"><h4>Branding & Logo Design</h4></div>
+        <div class="service"><h4>HR & Hiring Tools</h4></div>
+        <div class="service"><h4>Sales Strategy & Coaching</h4></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="container">
+      <h2>About BizNet Connect</h2>
+      <p>We’re on a mission to help entrepreneurs and business leaders build lasting, trusted relationships with service providers who help them grow. With a vetted community, dedicated tools, and a shared vision of excellence, we make networking truly effective.</p>
+    </div>
+  </section>
+
+  <section id="pricing" class="pricing">
+    <div class="container">
+      <h2>Subscription Options</h2>
+      <div class="pricing-cards">
+        <div class="card">
+          <h3>Monthly</h3>
+          <p class="price">$99 / month</p>
+          <p>Cancel anytime</p>
+          <a href="#" class="cta-button">Subscribe</a>
+        </div>
+        <div class="card featured">
+          <h3>Annual</h3>
+          <p class="price">$59 / month (billed yearly)</p>
+          <p>$708 upfront / Save $480</p>
+          <a href="#" class="cta-button">Subscribe Annually</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p>Have questions or ideas? Reach out below.</p>
+      <form>
+        <input type="text" placeholder="Your Name" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;">
+        <input type="email" placeholder="Your Email" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;">
+        <textarea placeholder="Your Message" rows="5" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;"></textarea>
+        <button type="submit" class="cta-button">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 BizNet Connect. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
