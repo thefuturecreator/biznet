@@ -3,234 +3,333 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BizNet Connect</title>
+  <title>Dispatch Wizard AI — Smart Service Dispatching</title>
+  <meta name="description" content="Browse services, choose trusted providers, and dispatch requests instantly with Dispatch Wizard AI." />
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <script>
-    function navigateTo(section) {
-      document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
-    }
-  </script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f7fafd;
-      color: #1a1a1a;
-    }
-    nav {
-      background-color: #ffffff;
-      border-bottom: 1px solid #ddd;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    nav .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #2196f3;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-      margin: 0;
-      padding: 0;
-    }
-    nav ul li {
-      cursor: pointer;
-      font-weight: 600;
-    }
-    nav ul li:hover {
-      color: #1c82d6;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 2rem;
-    }
-    .hero {
-      background: linear-gradient(135deg, #cfe9ff, #eaf4ff);
-      text-align: center;
-      padding: 5rem 2rem;
-    }
-    .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    .hero p {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-    }
-    .cta-button {
-      background-color: #2196f3;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
-    }
-    .cta-button:hover {
-      background-color: #1c82d6;
-    }
-    .features, .services, .app-preview, .pricing, .about, .contact {
-      background-color: white;
-      padding: 4rem 2rem;
-    }
-    .feature-grid, .service-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-    .feature, .service {
-      flex: 1;
-      min-width: 250px;
-      background-color: #f0f8ff;
-      padding: 2rem;
-      border-radius: 10px;
-    }
-    .app-image {
-      max-width: 300px;
-      margin-top: 2rem;
-    }
-    .pricing-cards {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-    .card {
-      background-color: #f0f8ff;
-      padding: 2rem;
-      border-radius: 12px;
-      width: 280px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .featured {
-      border: 2px solid #2196f3;
-    }
-    .price {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin: 1rem 0;
-    }
-    .footer {
-      background-color: #eaf4ff;
-      text-align: center;
-      padding: 2rem;
-      font-size: 0.9rem;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="dispatch-wizard.js" defer></script>
 </head>
 <body>
-  <nav>
-    <div class="logo">BizNet Connect</div>
-    <ul>
-      <li onclick="navigateTo('features')">Features</li>
-      <li onclick="navigateTo('services')">Services</li>
-      <li onclick="navigateTo('about')">About</li>
-      <li onclick="navigateTo('pricing')">Pricing</li>
-      <li onclick="navigateTo('contact')">Contact</li>
-    </ul>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-icon">&#9889;</span>
+        <span>Dispatch<span class="logo-accent">Wizard</span></span>
+      </a>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#dispatch">Terminal</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#dispatch" class="nav-cta">Try It Live</a></li>
+      </ul>
+    </div>
   </nav>
 
-  <header class="hero">
-    <div class="container">
-      <h1>Where Business Owners Thrive Together</h1>
-      <p>Connect. Collaborate. Scale.</p>
-      <a href="#pricing" class="cta-button">Join the Network</a>
+  <!-- Hero -->
+  <header class="hero" id="hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="container hero-content">
+      <div class="hero-badge">AI-Powered Dispatching</div>
+      <h1>Dispatch Services<br><span class="gradient-text">Like a Wizard</span></h1>
+      <p class="hero-sub">Browse vetted providers, dispatch requests, and track everything — all from one intelligent terminal interface.</p>
+      <div class="hero-actions">
+        <a href="#dispatch" class="btn btn-primary">Launch Terminal</a>
+        <a href="#features" class="btn btn-outline">Learn More</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">9+</span>
+          <span class="stat-label">Service Categories</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">27+</span>
+          <span class="stat-label">Trusted Providers</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">&lt;5s</span>
+          <span class="stat-label">To Dispatch</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <section id="features" class="features">
+  <!-- Features -->
+  <section id="features" class="section">
     <div class="container">
-      <h2>Why BizNet Connect?</h2>
-      <div class="feature-grid">
-        <div class="feature">
-          <h3>Targeted Networking</h3>
-          <p>Find professionals by niche — from finance to branding.</p>
+      <div class="section-header">
+        <span class="section-tag">Why Dispatch Wizard?</span>
+        <h2>Everything you need to<br><span class="gradient-text">dispatch with confidence</span></h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <h3>Smart Search</h3>
+          <p>Find the right service provider by category, specialty, or turnaround time. No endless scrolling.</p>
         </div>
-        <div class="feature">
-          <h3>Growth-Focused</h3>
-          <p>Gain access to resources, mentors, and marketing experts.</p>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Verified Providers</h3>
+          <p>Every provider is pre-vetted for quality and reliability. No guesswork — only trusted professionals.</p>
         </div>
-        <div class="feature">
-          <h3>Verified Community</h3>
-          <p>Each member is pre-vetted to ensure credibility.</p>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Instant Dispatch</h3>
+          <p>Three steps. That's all it takes. Pick a service, choose a provider, confirm. Done.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3>Live Tracking</h3>
+          <p>Monitor every dispatch request in real time. Know exactly where things stand at a glance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Terminal Interface</h3>
+          <p>A clean, powerful command-line experience right in your browser. Fast, focused, no distractions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Growing Network</h3>
+          <p>New providers join regularly. Your options keep expanding while quality stays high.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="services" class="services">
+  <!-- Services -->
+  <section id="services" class="section section-dark">
     <div class="container">
-      <h2>Services Available in the Network</h2>
-      <div class="service-grid">
-        <div class="service"><h4>Accounting & Bookkeeping</h4></div>
-        <div class="service"><h4>Legal Consultation</h4></div>
-        <div class="service"><h4>Business Funding</h4></div>
-        <div class="service"><h4>SEO / PPC / Ads</h4></div>
-        <div class="service"><h4>Web Design & Development</h4></div>
-        <div class="service"><h4>CRM & Automation</h4></div>
-        <div class="service"><h4>Branding & Logo Design</h4></div>
-        <div class="service"><h4>HR & Hiring Tools</h4></div>
-        <div class="service"><h4>Sales Strategy & Coaching</h4></div>
+      <div class="section-header">
+        <span class="section-tag">Service Categories</span>
+        <h2>Dispatch across<br><span class="gradient-text">every business need</span></h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">&#128200;</div>
+          <h4>Accounting & Bookkeeping</h4>
+          <span class="service-eta">ETA: 1-2 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#9878;</div>
+          <h4>Legal Consultation</h4>
+          <span class="service-eta">ETA: 2-3 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128176;</div>
+          <h4>Business Funding</h4>
+          <span class="service-eta">ETA: 3-5 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128640;</div>
+          <h4>SEO / PPC / Ads</h4>
+          <span class="service-eta">ETA: 1-3 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128421;</div>
+          <h4>Web Design & Dev</h4>
+          <span class="service-eta">ETA: 5-7 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#9881;</div>
+          <h4>CRM & Automation</h4>
+          <span class="service-eta">ETA: 2-4 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#127912;</div>
+          <h4>Branding & Logo Design</h4>
+          <span class="service-eta">ETA: 3-5 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128101;</div>
+          <h4>HR & Hiring Tools</h4>
+          <span class="service-eta">ETA: 2-3 days</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">&#128170;</div>
+          <h4>Sales Strategy & Coaching</h4>
+          <span class="service-eta">ETA: 1-2 days</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="about" class="about">
+  <!-- Dispatch Terminal -->
+  <section id="dispatch" class="section section-terminal">
     <div class="container">
-      <h2>About BizNet Connect</h2>
-      <p>We’re on a mission to help entrepreneurs and business leaders build lasting, trusted relationships with service providers who help them grow. With a vetted community, dedicated tools, and a shared vision of excellence, we make networking truly effective.</p>
-    </div>
-  </section>
-
-  <section id="pricing" class="pricing">
-    <div class="container">
-      <h2>Subscription Options</h2>
-      <div class="pricing-cards">
-        <div class="card">
-          <h3>Monthly</h3>
-          <p class="price">$99 / month</p>
-          <p>Cancel anytime</p>
-          <a href="#" class="cta-button">Subscribe</a>
+      <div class="section-header">
+        <span class="section-tag">Live Terminal</span>
+        <h2>Try the<br><span class="gradient-text">Dispatch Wizard</span></h2>
+        <p class="section-desc">Type <strong>help</strong> to see commands, or <strong>dispatch</strong> to start a request.</p>
+      </div>
+      <div id="dispatch-terminal" class="terminal">
+        <div class="term-titlebar">
+          <div class="term-dots">
+            <span class="term-dot red"></span>
+            <span class="term-dot yellow"></span>
+            <span class="term-dot green"></span>
+          </div>
+          <span class="term-title">dispatchwizard — terminal</span>
+          <div class="term-titlebar-spacer"></div>
         </div>
-        <div class="card featured">
-          <h3>Annual</h3>
-          <p class="price">$59 / month (billed yearly)</p>
-          <p>$708 upfront / Save $480</p>
-          <a href="#" class="cta-button">Subscribe Annually</a>
+        <div class="term-output"></div>
+        <div class="term-input-row">
+          <span class="term-prompt">wizard&gt;</span>
+          <input class="term-input" type="text" autocomplete="off" spellcheck="false" autofocus placeholder="type help to get started">
         </div>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="contact">
+  <!-- Pricing -->
+  <section id="pricing" class="section">
     <div class="container">
-      <h2>Contact Us</h2>
-      <p>Have questions or ideas? Reach out below.</p>
-      <form>
-        <input type="text" placeholder="Your Name" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;">
-        <input type="email" placeholder="Your Email" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;">
-        <textarea placeholder="Your Message" rows="5" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;"></textarea>
-        <button type="submit" class="cta-button">Send Message</button>
+      <div class="section-header">
+        <span class="section-tag">Pricing</span>
+        <h2>Simple, transparent<br><span class="gradient-text">pricing</span></h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Monthly</div>
+          <div class="pricing-amount"><span class="currency">$</span>99<span class="period">/mo</span></div>
+          <ul class="pricing-features">
+            <li>Full terminal access</li>
+            <li>All 9 service categories</li>
+            <li>Unlimited dispatches</li>
+            <li>Request tracking</li>
+            <li>Cancel anytime</li>
+          </ul>
+          <a href="#" class="btn btn-outline btn-block">Get Started</a>
+        </div>
+        <div class="pricing-card pricing-featured">
+          <div class="pricing-badge">Best Value</div>
+          <div class="pricing-tier">Annual</div>
+          <div class="pricing-amount"><span class="currency">$</span>59<span class="period">/mo</span></div>
+          <p class="pricing-note">$708/year — Save $480</p>
+          <ul class="pricing-features">
+            <li>Everything in Monthly</li>
+            <li>Priority provider matching</li>
+            <li>Early access to new services</li>
+            <li>Dedicated support</li>
+            <li>40% savings</li>
+          </ul>
+          <a href="#" class="btn btn-primary btn-block">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Get In Touch</span>
+        <h2>Questions?<br><span class="gradient-text">We'd love to hear from you</span></h2>
+      </div>
+      <form class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@company.com" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" rows="5" placeholder="How can we help?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
       </form>
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 BizNet Connect. All rights reserved.</p>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">&#9889;</span>
+        <span>Dispatch<span class="logo-accent">Wizard</span></span>
+      </div>
+      <p class="footer-copy">&copy; 2025 Dispatch Wizard AI. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#services">Services</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+      </div>
     </div>
   </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile menu toggle
+    document.getElementById('mobile-toggle').addEventListener('click', function () {
+      document.getElementById('nav-links').classList.toggle('open');
+      this.classList.toggle('active');
+    });
+
+    // Close mobile menu on link click
+    document.querySelectorAll('.nav-links a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        document.getElementById('nav-links').classList.remove('open');
+        document.getElementById('mobile-toggle').classList.remove('active');
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Intersection Observer for fade-in animations
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .service-card, .pricing-card, .section-header').forEach(function (el) {
+      el.classList.add('fade-in');
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>
