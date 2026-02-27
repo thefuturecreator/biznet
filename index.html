@@ -1,831 +1,1642 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚚</text></svg>" />
-  <title>Dispatch Wizard AI — CRM Order Ranking</title>
-  <meta name="description" content="Smart CRM order ranking and dispatch prioritization tool. Paste your live orders, rank them instantly." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT123 Dispatch Priority Ranker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚚</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111318;
+    --surface2: #1a1d24;
+    --border: #252830;
+    --border2: #2e3240;
+    --text: #e8eaf0;
+    --text2: #8b8fa8;
+    --text3: #555870;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --green: #10b981;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --tier1: #f59e0b;
+    --tier2: #10b981;
+    --tier3: #3b82f6;
+    --tier4: #8b8fa8;
+  }
 
-:root {
-  --bg: #f4f6fb;
-  --card-bg: #ffffff;
-  --card-border: #e2e6ef;
-  --text: #1a1d2e;
-  --text-secondary: #5a6178;
-  --text-muted: #8b91a8;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-light: #eef2ff;
-  --accent-glow: rgba(79, 70, 229, 0.15);
-  --green: #10b981;
-  --green-bg: #ecfdf5;
-  --green-border: #a7f3d0;
-  --red: #ef4444;
-  --red-bg: #fef2f2;
-  --orange: #f59e0b;
-  --orange-bg: #fffbeb;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow: 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.5;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
 
-/* ── Header ─────────────────────────────────────────────── */
-.header {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--card-border);
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-sm);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  font-size: 28px;
-  line-height: 1;
-}
-
-.logo-text {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-
-.logo-text span {
-  color: var(--accent);
-}
-
-.header-badge {
-  background: var(--accent-light);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-/* ── Main Layout ────────────────────────────────────────── */
-.main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 32px 20px 80px;
-}
-
-.page-title {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.page-title h1 {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 6px;
-  letter-spacing: -0.5px;
-}
-
-.page-title p {
-  color: var(--text-secondary);
-  font-size: 15px;
-}
-
-/* ── Card ───────────────────────────────────────────────── */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.card-title .icon {
-  font-size: 18px;
-}
-
-/* ── Textarea ───────────────────────────────────────────── */
-.order-input {
-  width: 100%;
-  min-height: 200px;
-  border: 2px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text);
-  background: #fafbfd;
-  resize: vertical;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  outline: none;
-}
-
-.order-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-glow);
-  background: #fff;
-}
-
-.order-input::placeholder {
-  color: var(--text-muted);
-}
-
-/* ── Buttons ────────────────────────────────────────────── */
-.btn-row {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--radius);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px var(--accent-glow);
-}
-
-.btn-primary:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 16px var(--accent-glow);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background: var(--bg);
-  color: var(--text-secondary);
-  border: 1px solid var(--card-border);
-}
-
-.btn-secondary:hover {
-  background: var(--card-border);
-  color: var(--text);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ── Results Section ────────────────────────────────────── */
-.results-section {
-  display: none;
-}
-
-.results-section.visible {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.results-summary {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.stat-box {
-  flex: 1;
-  min-width: 140px;
-  background: var(--bg);
-  border-radius: var(--radius);
-  padding: 16px;
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--accent);
-}
-
-.stat-label {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
-}
-
-/* ── Order List ─────────────────────────────────────────── */
-.order-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: var(--bg);
-  border-radius: var(--radius);
-  border-left: 4px solid transparent;
-  transition: all 0.2s;
-}
-
-.order-item:hover {
-  background: #eef0f7;
-}
-
-.order-item.priority-high {
-  border-left-color: var(--red);
-  background: var(--red-bg);
-}
-
-.order-item.priority-medium {
-  border-left-color: var(--orange);
-  background: var(--orange-bg);
-}
-
-.order-item.priority-low {
-  border-left-color: var(--green);
-  background: var(--green-bg);
-}
-
-.order-rank {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.order-item.priority-high .order-rank { background: var(--red); }
-.order-item.priority-medium .order-rank { background: var(--orange); }
-.order-item.priority-low .order-rank { background: var(--green); }
-
-.order-details {
-  flex: 1;
-  min-width: 0;
-}
-
-.order-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.order-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-.order-priority-tag {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-
-.order-item.priority-high .order-priority-tag {
-  background: var(--red);
-  color: #fff;
-}
-
-.order-item.priority-medium .order-priority-tag {
-  background: var(--orange);
-  color: #fff;
-}
-
-.order-item.priority-low .order-priority-tag {
-  background: var(--green);
-  color: #fff;
-}
-
-/* ── Loading ────────────────────────────────────────────── */
-.loading-spinner {
-  display: none;
-  text-align: center;
-  padding: 32px;
-}
-
-.loading-spinner.visible {
-  display: block;
-}
-
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--card-border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 12px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-/* ── Footer ─────────────────────────────────────────────── */
-.footer {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.footer strong {
-  color: var(--text-secondary);
-}
-
-/* ── Responsive ─────────────────────────────────────────── */
-@media (max-width: 640px) {
+  /* Header */
   .header {
-    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
 
-  .logo-text {
-    font-size: 17px;
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
+  .logo-badge {
+    background: var(--accent);
+    color: #000;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 4px 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-left: auto;
+  }
+
+  /* Main */
   .main {
-    padding: 20px 16px 60px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 32px;
   }
 
-  .page-title h1 {
-    font-size: 22px;
+  /* Paste Zone */
+  .paste-zone {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 24px;
   }
 
-  .card {
-    padding: 18px;
+  .paste-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .order-input {
+  .paste-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    padding: 16px;
+    resize: vertical;
     min-height: 160px;
-    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
   }
 
-  .btn-row {
-    flex-direction: column;
+  textarea:focus {
+    border-color: var(--accent);
+  }
+
+  textarea::placeholder {
+    color: var(--text3);
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    align-items: center;
   }
 
   .btn {
-    justify-content: center;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 12px 28px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
   }
 
-  .results-summary {
-    gap: 10px;
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-clear {
+    background: transparent;
+    color: var(--text3);
+    border: 1px solid var(--border2);
+    padding: 12px 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
   }
 
-  .stat-box {
-    min-width: 100px;
-    padding: 12px;
+  .btn-clear:hover { color: var(--text); border-color: var(--text3); }
+
+  .btn-export {
+    background: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 12px 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: auto;
+    display: none;
   }
 
-  .stat-value {
+  .btn-export:hover { background: rgba(16,185,129,0.1); }
+
+  .parse-info {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* Scoring legend */
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .legend-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+
+  .legend-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .legend-val {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Results */
+  .results-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .results-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .results-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: var(--accent);
+    color: #000;
+    padding: 2px 8px;
+    font-weight: 600;
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th:hover { color: var(--text); }
+
+  th.sort-asc::after { content: ' ▲'; color: var(--accent); }
+  th.sort-desc::after { content: ' ▼'; color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: var(--surface); }
+
+  td {
+    padding: 11px 14px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .rank-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text3);
+    width: 40px;
+  }
+
+  .rank-1 { color: var(--tier1); }
+  .rank-2 { color: var(--tier1); }
+  .rank-3 { color: var(--tier1); }
+
+  .order-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .customer-name {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  .vehicle-info {
+    color: var(--text2);
+    font-size: 11px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .route {
+    color: var(--text2);
+    font-size: 11px;
+    max-width: 240px;
+  }
+
+  .route-arrow {
+    color: var(--text3);
+    margin: 0 4px;
+  }
+
+  .state-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    cursor: default;
+  }
+  .status-new      { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+  .status-fresh    { color: var(--text3); }
+  .status-returning{ background: rgba(139,143,168,0.1); color: var(--text3); }
+  .status-aging    { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+  .status-stale    { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); animation: pulse-stale 2s infinite; }
+  .status-critical { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); animation: pulse-stale 1s infinite; }
+
+  @keyframes pulse-stale {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Sync Panel */
+  #syncPanel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+
+  .sync-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .sync-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    padding: 12px 16px;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .sync-item strong { font-size: 13px; display: block; color: var(--text); }
+  .sync-sub { font-size: 11px; color: var(--text3); margin-top: 2px; display: block; }
+  .sync-icon { font-size: 18px; flex-shrink: 0; }
+  .sync-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text3); margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+  .sync-good { color: var(--green); }
+  .sync-warn { color: #f97316; }
+
+  .sync-dispatched { border-color: rgba(16,185,129,0.3); }
+  .sync-new        { border-color: rgba(59,130,246,0.3); }
+  .sync-stale      { border-color: rgba(249,115,22,0.3); }
+  .sync-returning  { border-color: var(--border2); }
+  .sync-first      { border-color: rgba(245,158,11,0.3); }
+
+  .sync-clear-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    padding: 8px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    align-self: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .sync-clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* Dispatched Panel */
+  #dispatchedPanel { border: 1px solid rgba(16,185,129,0.2); }
+
+  .dispatched-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  .dispatched-header:hover { background: var(--surface2); }
+
+  .dispatched-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .dispatched-count {
+    background: rgba(16,185,129,0.2);
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+  }
+
+  .dispatched-toggle { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text3); }
+
+  .lane-hot  { background: rgba(16,185,129,0.15); color: #10b981; }
+  .lane-warm { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .lane-cool { background: rgba(139,143,168,0.12); color: #8b8fa8; }
+  .lane-cold { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+  .vsize-high { background: rgba(16,185,129,0.12); color: #10b981; }
+  .vsize-med  { background: rgba(59,130,246,0.12); color: #3b82f6; }
+  .vsize-low  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+  .vsize-spec { background: rgba(239,68,68,0.12); color: #ef4444; }
+  .snow-none { background: rgba(16,185,129,0.15); color: #10b981; }
+  .snow-low  { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .snow-med  { background: rgba(249,115,22,0.15); color: #f97316; }
+  .snow-high { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  .broker-fee {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--green);
+  }
+
+  .total-fee {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .score-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+  }
+
+  .score-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s;
+  }
+
+  .score-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    width: 28px;
+    text-align: right;
+  }
+
+  .tier-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .tier-A { background: rgba(245,158,11,0.2); color: var(--tier1); border: 1px solid rgba(245,158,11,0.3); }
+  .tier-B { background: rgba(16,185,129,0.15); color: var(--tier2); border: 1px solid rgba(16,185,129,0.3); }
+  .tier-C { background: rgba(59,130,246,0.15); color: var(--tier3); border: 1px solid rgba(59,130,246,0.3); }
+  .tier-D { background: rgba(139,143,168,0.1); color: var(--tier4); border: 1px solid rgba(139,143,168,0.2); }
+
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    margin-right: 3px;
+  }
+
+  .tag-port    { background: rgba(249,115,22,0.15); color: #f97316; }
+  .tag-prepaid { background: rgba(16,185,129,0.15); color: #10b981; }
+  .tag-enclosed { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+  .tag-nonrun { background: rgba(239,68,68,0.12); color: #ef4444; }
+  .tag-urgent { background: rgba(245,158,11,0.15); color: var(--accent); }
+
+  .pickup-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .pickup-urgent { color: var(--accent); font-weight: 600; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 32px;
+    color: var(--text3);
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  .empty-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 12px;
+    color: var(--text3);
+    opacity: 0.6;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .stat-item {
+    background: var(--surface);
+    padding: 14px 18px;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .stat-val {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
   }
 
-  .order-item {
-    padding: 12px;
-    gap: 10px;
+  .stat-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
   }
-}
-  </style>
+
+  .results-wrap { display: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* Row highlight for top 3 */
+  .top-order td:first-child { border-left: 3px solid var(--accent); }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+  .filter-btn:hover { border-color: var(--text2); color: var(--text2); }
+
+  .search-input {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    outline: none;
+    width: 200px;
+    margin-left: auto;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+</style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <span class="logo-icon">🚚</span>
-      <span class="logo-text">Dispatch<span>Wizard</span> AI</span>
+<div class="header">
+  <div class="logo">
+    <div class="logo-badge">UT123</div>
+    <span class="header-title">Dispatch Priority Ranker</span>
+  </div>
+  <div class="header-sub" id="lastRun">No data loaded</div>
+</div>
+
+<div class="main">
+
+  <!-- Paste Zone -->
+  <div class="paste-zone">
+    <div class="paste-label">Paste Live Orders from CRM</div>
+    <textarea id="orderData" placeholder="Copy all orders from Live Orders in Message Plane CRM and paste here..."></textarea>
+    <div class="controls">
+      <button class="btn" onclick="rankOrders()">⚡ RANK ORDERS</button>
+      <button class="btn-clear" onclick="clearAll()">Clear</button>
+      <button class="btn-export" id="exportBtn" onclick="exportCSV()">↓ Export CSV</button>
+      <span class="parse-info" id="parseInfo"></span>
     </div>
-    <span class="header-badge">Built for UT123</span>
-  </header>
+  </div>
 
-  <!-- Main Content -->
-  <main class="main">
-    <div class="page-title">
-      <h1>CRM Order Ranking</h1>
-      <p>Paste your live orders below and rank them by priority instantly</p>
-    </div>
+  <!-- Sync Panel -->
+  <div id="syncPanel" style="display:none;margin-bottom:20px;"></div>
 
-    <!-- Input Card -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="icon">📋</span>
-          Paste Live Orders from CRM
-        </div>
-      </div>
-      <textarea id="orderInput" class="order-input" placeholder="Paste your CRM orders here...
+  <!-- Results -->
+  <div class="results-wrap" id="resultsWrap">
 
-Example format:
-ORD-1001 | Acme Corp | $12,500 | Due: Mar 3 | New
-ORD-1002 | GlobalTech | $8,200 | Due: Mar 1 | Rush
-ORD-1003 | Smith & Co | $3,400 | Due: Mar 7 | Standard
-ORD-1004 | Vertex LLC | $24,000 | Due: Feb 28 | Urgent
+    <!-- Stats -->
+    <div class="stats-bar" id="statsBar"></div>
 
-Or paste any text — orders will be parsed automatically."></textarea>
-      <div class="btn-row">
-        <button id="rankBtn" class="btn btn-primary" onclick="rankOrders()">
-          <span>⚡</span> Rank Orders
-        </button>
-        <button class="btn btn-secondary" onclick="clearAll()">
-          Clear
-        </button>
-        <button class="btn btn-secondary" onclick="loadSample()">
-          Load Sample
-        </button>
-      </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner">
-      <div class="spinner"></div>
-      <div class="loading-text">Analyzing and ranking orders...</div>
+    <!-- Filter Row -->
+    <div class="filter-row">
+      <span class="filter-label">Filter:</span>
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('A', this)">🥇 Tier A</button>
+      <button class="filter-btn" onclick="setFilter('B', this)">🥈 Tier B</button>
+      <button class="filter-btn" onclick="setFilter('C', this)">🥉 Tier C</button>
+      <button class="filter-btn" onclick="setFilter('prepaid', this)">💰 Pre-Paid</button>
+      <button class="filter-btn" onclick="setFilter('stale', this)">⏰ Aging</button>
+      <button class="filter-btn" onclick="setFilter('new', this)">🆕 New</button>
+      <button class="filter-btn" onclick="setFilter('urgent', this)">🔥 Today</button>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search orders..." oninput="applyFilter()">
     </div>
 
-    <!-- Results -->
-    <div id="resultsSection" class="results-section">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <span class="icon">📊</span>
-            Ranked Results
-          </div>
-          <button class="btn btn-secondary" onclick="copyResults()" style="padding: 8px 14px; font-size: 13px;">
-            📋 Copy
-          </button>
-        </div>
-
-        <div id="resultsSummary" class="results-summary"></div>
-        <div id="orderList" class="order-list"></div>
-      </div>
+    <div class="results-header">
+      <span class="results-title">Priority Queue</span>
+      <span class="results-count" id="resultsCount">0</span>
     </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    🚚 <strong>Dispatch Wizard AI</strong> — Smart CRM order prioritization
-  </footer>
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th onclick="sortBy('rank')">#</th>
+            <th>Status</th>
+            <th>Tier</th>
+            <th onclick="sortBy('orderId')">Order</th>
+            <th onclick="sortBy('customer')">Customer</th>
+            <th onclick="sortBy('vehicle')">Vehicle</th>
+            <th onclick="sortBy('origin')">Origin</th>
+            <th>Snow Risk</th>
+            <th onclick="sortBy('destination')">Destination</th>
+            <th onclick="sortBy('lane')">Lane</th>
+            <th onclick="sortBy('vehicleSize')">Unit Size</th>
+            <th onclick="sortBy('pickup')">Pickup</th>
+            <th onclick="sortBy('broker')">Broker $</th>
+            <th onclick="sortBy('total')">Total</th>
+            <th>Tags</th>
+            <th onclick="sortBy('score')">Score</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
 
-  <script>
-(function () {
-  'use strict';
+    <div id="emptyFiltered" style="display:none;text-align:center;padding:40px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;">
+      No orders match filter
+    </div>
 
-  var PRIORITY_KEYWORDS = {
-    high: ['urgent', 'rush', 'asap', 'critical', 'emergency', 'hot', 'priority', 'expedite', 'immediate'],
-    medium: ['standard', 'normal', 'new', 'pending', 'open', 'active', 'processing'],
-    low: ['low', 'backlog', 'hold', 'deferred', 'later', 'future', 'tentative']
+  </div>
+
+  <!-- Dispatched Panel -->
+  <div id="dispatchedPanel" style="display:none;margin-top:24px;background:var(--surface);border:1px solid var(--border)"></div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+//  MEMORY / SYNC ENGINE
+//  localStorage key: ut123_dispatch_memory
+//  Stores: sessions array, each with timestamp + snapshot of orders by ID
+//  On each rank run → cross-reference to determine status of every order
+// ══════════════════════════════════════════════════════════════════════════════
+const MEMORY_KEY = 'ut123_dispatch_memory';
+const MAX_SESSIONS = 50; // keep last 50 sessions in memory
+
+// Age thresholds in minutes
+const AGE_FRESH   = 120;  // < 2hrs  — just seen, normal
+const AGE_AGING   = 240;  // 2-4hrs  — still on list, flag it
+const AGE_STALE   = 360;  // 4-6hrs  — been sitting, push up
+const AGE_CRITICAL= 360;  // 6hrs+   — hasn't moved, must work now
+
+function loadMemory() {
+  try {
+    const raw = localStorage.getItem(MEMORY_KEY);
+    return raw ? JSON.parse(raw) : { sessions: [] };
+  } catch(e) { return { sessions: [] }; }
+}
+
+function saveMemory(mem) {
+  try { localStorage.setItem(MEMORY_KEY, JSON.stringify(mem)); } catch(e) {}
+}
+
+function clearMemory() {
+  localStorage.removeItem(MEMORY_KEY);
+}
+
+// Serialize an order for snapshot storage (only what we need for cross-ref)
+function snapshotOrder(o) {
+  return {
+    orderId: o.orderId,
+    customer: o.customer,
+    vehicle: o.vehicle,
+    originState: o.originState,
+    destState: o.destState,
+    broker: o.broker,
+    total: o.total,
+    pickupDate: o.pickupDate,
+    score: o.score,
+    rank: o.rank,
+    tier: o.tier,
+    prepaid: o.prepaid,
+    isPort: o.isPort,
   };
+}
 
-  // Parse the raw text input into structured orders
-  function parseOrders(text) {
-    var lines = text.split('\n').filter(function (l) { return l.trim().length > 0; });
-    var orders = [];
+// ── SYNC: Compare current order list against memory history ─────────────────
+// Returns enriched orders with .memStatus, .firstSeen, .lastSeen, .ageMinutes
+// Also returns dispatchedOrders — were in last session, not in current list
+function syncWithMemory(currentOrders) {
+  const mem = loadMemory();
+  const now = Date.now();
+  const currentIds = new Set(currentOrders.map(o => o.orderId));
 
-    lines.forEach(function (line, index) {
-      var trimmed = line.trim();
-      if (!trimmed) return;
+  // Build a lookup: orderId → earliest session it appeared in
+  const firstSeenMap = {}; // orderId → timestamp
+  const lastSeenMap  = {}; // orderId → timestamp
+  const lastRankMap  = {}; // orderId → rank in most recent session it appeared
+  const lastScoreMap = {}; // orderId → score in most recent session
 
-      // Try pipe-delimited format: ID | Name | Amount | Due | Status
-      var parts = trimmed.split('|').map(function (p) { return p.trim(); });
-
-      var order = {
-        raw: trimmed,
-        index: index
-      };
-
-      if (parts.length >= 3) {
-        order.id = parts[0] || 'ORD-' + (index + 1);
-        order.name = parts[1] || 'Order ' + (index + 1);
-        order.amount = parseAmount(parts[2] || '');
-        order.due = parts[3] || '';
-        order.status = parts[4] || '';
-      } else if (parts.length === 2) {
-        order.id = parts[0];
-        order.name = parts[1];
-        order.amount = parseAmount(parts[1]);
-        order.due = '';
-        order.status = '';
-      } else {
-        // Single line — treat the whole thing as order info
-        order.id = 'ORD-' + (index + 1);
-        order.name = trimmed.substring(0, 60);
-        order.amount = parseAmount(trimmed);
-        order.due = extractDate(trimmed);
-        order.status = '';
-      }
-
-      order.priority = detectPriority(trimmed, order);
-      order.score = calculateScore(order);
-      orders.push(order);
+  mem.sessions.forEach(session => {
+    session.orders.forEach(snap => {
+      if (!firstSeenMap[snap.orderId]) firstSeenMap[snap.orderId] = session.timestamp;
+      lastSeenMap[snap.orderId]  = session.timestamp;
+      lastRankMap[snap.orderId]  = snap.rank;
+      lastScoreMap[snap.orderId] = snap.score;
     });
+  });
 
-    // Sort by score descending (highest priority first)
-    orders.sort(function (a, b) { return b.score - a.score; });
+  // Enrich current orders with memory data
+  currentOrders.forEach(o => {
+    const firstSeen = firstSeenMap[o.orderId];
+    const lastSeen  = lastSeenMap[o.orderId];
 
-    return orders;
-  }
-
-  function parseAmount(str) {
-    var match = str.match(/\$[\d,]+(\.\d{2})?/);
-    if (match) {
-      return parseFloat(match[0].replace(/[$,]/g, ''));
-    }
-    return 0;
-  }
-
-  function extractDate(str) {
-    var patterns = [
-      /due[:\s]*([A-Za-z]+\s+\d{1,2})/i,
-      /(\d{1,2}\/\d{1,2}\/?\d{0,4})/,
-      /([A-Za-z]{3}\s+\d{1,2})/
-    ];
-    for (var i = 0; i < patterns.length; i++) {
-      var m = str.match(patterns[i]);
-      if (m) return m[1] || m[0];
-    }
-    return '';
-  }
-
-  function detectPriority(text, order) {
-    var lower = text.toLowerCase();
-
-    for (var i = 0; i < PRIORITY_KEYWORDS.high.length; i++) {
-      if (lower.indexOf(PRIORITY_KEYWORDS.high[i]) !== -1) return 'high';
-    }
-    for (var j = 0; j < PRIORITY_KEYWORDS.low.length; j++) {
-      if (lower.indexOf(PRIORITY_KEYWORDS.low[j]) !== -1) return 'low';
-    }
-
-    // High amount = higher priority
-    if (order.amount >= 15000) return 'high';
-    if (order.amount >= 5000) return 'medium';
-
-    return 'medium';
-  }
-
-  function calculateScore(order) {
-    var score = 0;
-
-    // Priority weight
-    if (order.priority === 'high') score += 100;
-    else if (order.priority === 'medium') score += 50;
-    else score += 10;
-
-    // Amount weight (normalized)
-    if (order.amount > 0) {
-      score += Math.min(order.amount / 500, 50);
-    }
-
-    // Due date urgency — sooner = higher score
-    if (order.due) {
-      var dueLower = order.due.toLowerCase();
-      if (dueLower.indexOf('today') !== -1 || dueLower.indexOf('asap') !== -1) {
-        score += 40;
-      } else if (dueLower.indexOf('tomorrow') !== -1) {
-        score += 30;
-      } else {
-        // Try to parse actual date
-        var d = new Date(order.due);
-        if (!isNaN(d.getTime())) {
-          var daysUntil = (d - new Date()) / (1000 * 60 * 60 * 24);
-          if (daysUntil <= 1) score += 40;
-          else if (daysUntil <= 3) score += 25;
-          else if (daysUntil <= 7) score += 15;
-          else score += 5;
-        }
-      }
-    }
-
-    return Math.round(score);
-  }
-
-  // Render results to the DOM
-  function renderResults(orders) {
-    var resultsSection = document.getElementById('resultsSection');
-    var summaryEl = document.getElementById('resultsSummary');
-    var listEl = document.getElementById('orderList');
-
-    // Count priorities
-    var counts = { high: 0, medium: 0, low: 0 };
-    var totalValue = 0;
-    orders.forEach(function (o) {
-      counts[o.priority]++;
-      totalValue += o.amount;
-    });
-
-    // Summary
-    summaryEl.innerHTML =
-      '<div class="stat-box"><div class="stat-value">' + orders.length + '</div><div class="stat-label">Total Orders</div></div>' +
-      '<div class="stat-box"><div class="stat-value" style="color:var(--red)">' + counts.high + '</div><div class="stat-label">High Priority</div></div>' +
-      '<div class="stat-box"><div class="stat-value" style="color:var(--orange)">' + counts.medium + '</div><div class="stat-label">Medium</div></div>' +
-      '<div class="stat-box"><div class="stat-value" style="color:var(--green)">' + counts.low + '</div><div class="stat-label">Low</div></div>' +
-      (totalValue > 0 ? '<div class="stat-box"><div class="stat-value">$' + totalValue.toLocaleString() + '</div><div class="stat-label">Total Value</div></div>' : '');
-
-    // Order list
-    listEl.innerHTML = '';
-    orders.forEach(function (order, i) {
-      var item = document.createElement('div');
-      item.className = 'order-item priority-' + order.priority;
-      item.innerHTML =
-        '<div class="order-rank">' + (i + 1) + '</div>' +
-        '<div class="order-details">' +
-          '<div class="order-name">' + escapeHtml(order.id + (order.name && order.name !== order.id ? ' — ' + order.name : '')) + '</div>' +
-          '<div class="order-meta">' +
-            (order.amount > 0 ? '$' + order.amount.toLocaleString() : '') +
-            (order.due ? (order.amount > 0 ? ' · ' : '') + 'Due: ' + escapeHtml(order.due) : '') +
-            (order.status ? ' · ' + escapeHtml(order.status) : '') +
-            ' · Score: ' + order.score +
-          '</div>' +
-        '</div>' +
-        '<span class="order-priority-tag">' + order.priority + '</span>';
-      listEl.appendChild(item);
-    });
-
-    resultsSection.classList.add('visible');
-  }
-
-  function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ── Public API ──────────────────────────────────────────────
-
-  window.rankOrders = function () {
-    var input = document.getElementById('orderInput').value.trim();
-    if (!input) {
-      alert('Please paste your CRM orders first.');
-      return;
-    }
-
-    var resultsSection = document.getElementById('resultsSection');
-    var loadingSpinner = document.getElementById('loadingSpinner');
-
-    resultsSection.classList.remove('visible');
-    loadingSpinner.classList.add('visible');
-
-    // Simulate brief processing time for UX
-    setTimeout(function () {
-      var orders = parseOrders(input);
-      loadingSpinner.classList.remove('visible');
-
-      if (orders.length === 0) {
-        alert('Could not parse any orders. Try a different format.');
-        return;
-      }
-
-      renderResults(orders);
-
-      // Scroll to results
-      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 600);
-  };
-
-  window.clearAll = function () {
-    document.getElementById('orderInput').value = '';
-    document.getElementById('resultsSection').classList.remove('visible');
-    document.getElementById('loadingSpinner').classList.remove('visible');
-  };
-
-  window.loadSample = function () {
-    document.getElementById('orderInput').value =
-      'ORD-4401 | Vertex Industries | $24,000 | Due: Mar 1 | Urgent\n' +
-      'ORD-4402 | Pinnacle Group | $18,750 | Due: Mar 3 | Rush\n' +
-      'ORD-4403 | Summit Healthcare | $9,200 | Due: Mar 5 | Standard\n' +
-      'ORD-4404 | Redline Logistics | $6,800 | Due: Mar 2 | Priority\n' +
-      'ORD-4405 | Atlas Manufacturing | $31,500 | Due: Feb 28 | Critical\n' +
-      'ORD-4406 | Coastline Retail | $4,100 | Due: Mar 10 | Standard\n' +
-      'ORD-4407 | Bridgeport LLC | $2,250 | Due: Mar 12 | Low\n' +
-      'ORD-4408 | NovaTech Solutions | $15,600 | Due: Mar 4 | New\n' +
-      'ORD-4409 | Greenfield Farms | $1,800 | Due: Mar 15 | Backlog\n' +
-      'ORD-4410 | Metro Services Inc | $11,300 | Due: Mar 1 | ASAP';
-    document.getElementById('resultsSection').classList.remove('visible');
-  };
-
-  window.copyResults = function () {
-    var listEl = document.getElementById('orderList');
-    var items = listEl.querySelectorAll('.order-item');
-    var text = 'RANKED ORDERS\n' + '='.repeat(40) + '\n\n';
-
-    items.forEach(function (item, i) {
-      var name = item.querySelector('.order-name').textContent;
-      var meta = item.querySelector('.order-meta').textContent;
-      var tag = item.querySelector('.order-priority-tag').textContent;
-      text += '#' + (i + 1) + ' [' + tag.toUpperCase() + '] ' + name + '\n   ' + meta + '\n\n';
-    });
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text);
+    if (!firstSeen) {
+      // Brand new — never seen before
+      o.memStatus   = 'new';
+      o.firstSeen   = now;
+      o.ageMinutes  = 0;
+      o.prevRank    = null;
+      o.prevScore   = null;
     } else {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
+      o.firstSeen  = firstSeen;
+      o.lastSeen   = lastSeen;
+      o.ageMinutes = Math.floor((now - firstSeen) / 60000);
+      o.prevRank   = lastRankMap[o.orderId] || null;
+      o.prevScore  = lastScoreMap[o.orderId] || null;
 
-    var btn = event.target.closest('.btn');
-    if (btn) {
-      var orig = btn.innerHTML;
-      btn.innerHTML = '✓ Copied';
-      setTimeout(function () { btn.innerHTML = orig; }, 1500);
-    }
-  };
-
-  // Allow Ctrl/Cmd+Enter to rank
-  document.getElementById('orderInput').addEventListener('keydown', function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      window.rankOrders();
+      if (o.ageMinutes >= AGE_CRITICAL) o.memStatus = 'critical';
+      else if (o.ageMinutes >= AGE_STALE)  o.memStatus = 'stale';
+      else if (o.ageMinutes >= AGE_FRESH)  o.memStatus = 'aging';
+      else                                  o.memStatus = 'returning';
     }
   });
 
-})();
-  </script>
+  // Find dispatched orders — were in last session but NOT in current list
+  let dispatchedOrders = [];
+  if (mem.sessions.length > 0) {
+    const lastSession = mem.sessions[mem.sessions.length - 1];
+    lastSession.orders.forEach(snap => {
+      if (!currentIds.has(snap.orderId)) {
+        dispatchedOrders.push({
+          ...snap,
+          memStatus: 'dispatched',
+          dispatchedAt: now,
+          lastSeenAt: lastSession.timestamp,
+          minutesAgo: Math.floor((now - lastSession.timestamp) / 60000),
+        });
+      }
+    });
+  }
+
+  // Save this run as a new session
+  const newSession = {
+    timestamp: now,
+    orders: currentOrders.map(snapshotOrder),
+  };
+  mem.sessions.push(newSession);
+  // Trim old sessions
+  if (mem.sessions.length > MAX_SESSIONS) {
+    mem.sessions = mem.sessions.slice(mem.sessions.length - MAX_SESSIONS);
+  }
+  saveMemory(mem);
+
+  return { enrichedOrders: currentOrders, dispatchedOrders };
+}
+
+// Age urgency bonus — orders sitting on the list too long get a priority bump
+// Dispatcher NEEDS to move these now
+function ageBonus(o) {
+  if (!o.ageMinutes) return 0;
+  if (o.ageMinutes >= AGE_CRITICAL) return 15;
+  if (o.ageMinutes >= AGE_STALE)    return 10;
+  if (o.ageMinutes >= AGE_FRESH)    return 5;
+  return 0;
+}
+
+function formatAge(minutes) {
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h ago`;
+}
+
+// ── REGION MAP FOR LANE SCORING ─────────────────────────────────────────────
+const REGION = {
+  // Northeast
+  NY:'NE',NJ:'NE',CT:'NE',MA:'NE',RI:'NE',NH:'NE',VT:'NE',ME:'NE',PA:'NE',DE:'NE',MD:'NE',
+  // Southeast / Sunbelt
+  FL:'SE',GA:'SE',SC:'SE',NC:'SE',VA:'SE',
+  // Midwest
+  OH:'MW',IN:'MW',IL:'MW',MI:'MW',WI:'MW',MN:'MW',IA:'MW',MO:'MW',KS:'MW',NE:'MW',ND:'MW',SD:'MW',
+  // South / TX Corridor
+  TX:'TX',LA:'TX',AR:'TX',MS:'TX',AL:'TX',TN:'TX',KY:'TX',WV:'TX',
+  // Mountain / Plains
+  CO:'MT',WY:'MT',MT:'MT',ID:'MT',UT:'MT',AZ:'MT',NM:'MT',
+  // West Coast
+  CA:'WC',OR:'WC',WA:'WC',NV:'WC',
+};
+
+// Lane strength score (0-20 pts) — carrier density on this corridor
+// Based on how many carriers actively run these routes
+const LANE_STRENGTH = {
+  'SE-NE':20,'NE-SE':20,  // Snowbird lanes — hottest in the country
+  'WC-TX':18,'TX-WC':18,  // CA↔TX — extremely active
+  'WC-SE':17,'SE-WC':17,  // CA↔FL — very hot
+  'WC-NE':16,'NE-WC':16,  // CA↔Northeast — solid volume
+  'WC-MW':15,'MW-WC':15,  // CA↔Midwest
+  'TX-SE':15,'SE-TX':15,  // TX↔Southeast
+  'TX-NE':14,'NE-TX':14,  // TX↔Northeast
+  'TX-MW':13,'MW-TX':13,  // TX↔Midwest
+  'SE-MW':13,'MW-SE':13,  // Southeast↔Midwest
+  'NE-MW':12,'MW-NE':12,  // Northeast↔Midwest
+  'WC-MT':11,'MT-WC':11,  // West↔Mountain
+  'TX-MT':10,'MT-TX':10,
+  'SE-MT':9,'MT-SE':9,
+  'NE-MT':8,'MT-NE':8,
+  'MW-MT':8,'MT-MW':8,
+};
+const DEFAULT_LANE = 5; // Same region or unknown
+const SAME_STATE_LANE = 2; // Very short haul — few carriers bother
+
+// ── VEHICLE SIZE / TYPE SCORING (0-15 pts) ────────────────────────────────
+// Higher = more carriers available = better cold call conversion
+const VEHICLE_SIZE_SCORE = {
+  'Car':15,       // Most common — every carrier runs these
+  'SUV':14,       // Very common
+  'Pickup':13,    // Common, slightly taller
+  'Motorcycle':10,// Specialty equipment needed but decent market
+  'Van':9,        // Sprinters, cargo vans — medium carrier pool
+  'ATV':7,        // Specialty, needs ramps/tie-down rigging
+  'Other':6,      // Catch-all — unknown size/type
+  'Truck':4,      // Box trucks, semi-trucks — small carrier pool
+  'Bus':3,        // Very specialized, few carriers
+  'Heavy':2,      // Heavy equipment — smallest carrier pool
+};
+
+const VEHICLE_SIZE_LABEL = {
+  'Car':'Standard','SUV':'SUV/CUV','Pickup':'Pickup','Motorcycle':'Moto',
+  'Van':'Van','ATV':'ATV/UTV','Other':'Other','Truck':'Box Truck','Bus':'Bus','Heavy':'Heavy Equip'
+};
+
+function getVehicleCategory(type, vehicle) {
+  const t = (type || '').toLowerCase();
+  const v = (vehicle || '').toLowerCase();
+  if (t === 'car') return 'Car';
+  if (t === 'suv') return 'SUV';
+  if (t === 'pickup') return 'Pickup';
+  if (t === 'motorcycle') return 'Motorcycle';
+  if (t === 'van') return 'Van';
+  if (t === 'atv') return 'ATV';
+  if (t === 'other') {
+    if (v.includes('bus') || v.includes('school bus')) return 'Bus';
+    if (v.includes('box truck') || v.includes('t7500') || v.includes('semi')) return 'Truck';
+    if (v.includes('stump') || v.includes('grinder') || v.includes('excavat') || v.includes('dozer')) return 'Heavy';
+    if (v.includes('utility') || v.includes('cushman') || v.includes('taylor dunn')) return 'ATV';
+    return 'Other';
+  }
+  return 'Other';
+}
+
+function getLaneScore(originState, destState) {
+  if (!originState || !destState) return DEFAULT_LANE;
+  if (originState === destState) return SAME_STATE_LANE;
+  const ro = REGION[originState];
+  const rd = REGION[destState];
+  if (!ro || !rd) return DEFAULT_LANE;
+  if (ro === rd) return 6; // Same region, short-ish
+  const key = ro + '-' + rd;
+  return LANE_STRENGTH[key] ?? DEFAULT_LANE;
+}
+
+// ── SNOW RISK BY STATE (February/March context) ──────────────────────────────
+// 0 = none (green), 1 = low (yellow), 2 = med (orange), 3 = high (red)
+const SNOW_RISK = {
+  // No risk
+  FL:0, HI:0, AK:0,
+  // Very low risk
+  TX:1, AZ:1, NM:1, LA:1, MS:1, AL:1, GA:1, SC:1, NC:1, AR:1,
+  CA:1, NV:1,
+  // Medium risk
+  TN:2, VA:2, WV:2, MO:2, KS:2, OK:2, OR:2, WA:2, UT:2,
+  // High risk
+  CO:3, WY:3, MT:3, ID:3, MI:3, NY:3, NJ:3, MA:3, OH:3,
+  IN:3, IL:3, WI:3, MN:3, ND:3, SD:3, NE:3, IA:3, PA:3,
+  ME:3, VT:3, NH:3, CT:3, RI:3, DE:3, MD:3, KY:2,
+};
+
+const SNOW_LABEL = ['✓ Clear', '⚠ Low', '▲ Med', '✕ High'];
+const SNOW_CLASS = ['snow-none','snow-low','snow-med','snow-high'];
+
+let allOrders = [];
+let dispatchedOrders = [];
+let sortCol = 'rank';
+let sortDir = 'asc';
+let currentFilter = 'all';
+let lastSyncDiff = null; // summary of what changed
+
+// ── PARSE ──────────────────────────────────────────────────────────────────
+function parseOrders(text) {
+  const orders = [];
+  // Split on order ID pattern like 4522814-AT
+  const blocks = text.split(/(?=\d{7}-AT\b)/);
+
+  blocks.forEach(block => {
+    block = block.trim();
+    if (!block) return;
+
+    const o = {};
+
+    // Order ID
+    const idMatch = block.match(/^(\d{7}-AT)/);
+    if (!idMatch) return;
+    o.orderId = idMatch[1];
+
+    // Date/time created
+    const dateMatch = block.match(/(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}\s+[ap]m)/i);
+    o.createdAt = dateMatch ? dateMatch[1] : '';
+
+    // Agent
+    const agentMatch = block.match(/(?:\d{2}:\d{2}\s+[ap]m)\s+([^\n]+?)(?:\s+ext\.\s*\d+)?(?:\s{2,}|\t)/i);
+    o.agent = agentMatch ? agentMatch[1].trim() : '';
+
+    // Customer name (after agent line, before email)
+    const custMatch = block.match(/ext\.\s*\d+\s+([A-Z][a-zA-Z]+\s+[A-Z][a-zA-Z]+)/);
+    o.customer = custMatch ? custMatch[1] : '';
+
+    // Email
+    const emailMatch = block.match(/[\w.+-]+@[\w.-]+\.\w+/);
+    o.email = emailMatch ? emailMatch[0] : '';
+
+    // Vehicle type
+    const typeMatch = block.match(/\(([^)]+)\)/);
+    o.vehicleType = typeMatch ? typeMatch[1] : '';
+
+    // Year/Make/Model - after vehicle type
+    const vehLineMatch = block.match(/\([^)]+\)\s*\n([^\n]+)/);
+    o.vehicle = vehLineMatch ? vehLineMatch[1].trim() : '';
+
+    // Ship via
+    o.enclosed = /Ship Via:Enclosed/i.test(block);
+
+    // Runs
+    o.runs = /Vehicle Runs:Yes/i.test(block);
+
+    // Origin state
+    const stateMatches = [...block.matchAll(/([A-Z]{2})\s+\d{5}/g)];
+    o.originState = stateMatches.length > 0 ? stateMatches[0][1] : '';
+    o.destState   = stateMatches.length > 1 ? stateMatches[1][1] : '';
+
+    // Origin city - try to extract city from origin address
+    const originCityMatch = block.match(/United States\s*\n([^\n]+)\s*\n([^\n]+?)([A-Z]{2})\s+\d{5}/);
+    if (originCityMatch) {
+      o.originCity = originCityMatch[2].trim().replace(/,\s*$/, '');
+    } else {
+      // fallback: look for state pattern
+      const m = block.match(/([A-Za-z\s]+),?\s+([A-Z]{2})\s+\d{5}United States/);
+      o.originCity = m ? m[1].trim() : o.originState;
+    }
+
+    // Origin city + address for port detection
+    const allAddressBlocks = [...block.matchAll(/([A-Za-z\s.]+),?\s+([A-Z]{2})\s+(\d{5})United States/g)];
+    if (allAddressBlocks.length >= 2) {
+      o.originCity = allAddressBlocks[0][1].trim().split(/\s+/).slice(-2).join(' ');
+      o.destCity   = allAddressBlocks[1][1].trim().split(/\s+/).slice(-2).join(' ');
+    } else {
+      o.destCity = o.destState;
+    }
+
+    // Pickup date
+    const pickupMatch = block.match(/(\d{2}\/\d{2}\/\d{4})\s*\n\s*bump date/i);
+    o.pickupDate = pickupMatch ? pickupMatch[1] : '';
+
+    // Parse pickup date for urgency
+    if (o.pickupDate) {
+      const [m2,d2,y2] = o.pickupDate.split('/');
+      o.pickupDateObj = new Date(y2, m2-1, d2);
+    } else {
+      o.pickupDateObj = null;
+    }
+
+    // Fees
+    const totalMatch  = block.match(/Total:\$([0-9,]+)/);
+    const brokerMatch = block.match(/Broker:\$([0-9,]+)/);
+    const carrierMatch= block.match(/Carrier:\$([0-9,]+)/);
+    o.total   = totalMatch  ? parseInt(totalMatch[1].replace(',','')) : 0;
+    o.broker  = brokerMatch ? parseInt(brokerMatch[1].replace(',','')) : 0;
+    o.carrier = carrierMatch? parseInt(carrierMatch[1].replace(',','')) : 0;
+
+    // Shipper pre-payment
+    o.prepaid = /Shipper Pre-payment To Broker/i.test(block);
+
+    orders.push(o);
+  });
+
+  return orders;
+}
+
+// ── SCORE ──────────────────────────────────────────────────────────────────
+// ── PORT ORDER DETECTION ─────────────────────────────────────────────────────
+// Long Beach CA origin + broker fee suspiciously high = port fee inflating number
+// These should be worked but not artificially top-ranked on fee alone
+const PORT_CITIES = ['long beach','lonng beach','long bch','lbca'];
+function isPortOrder(o) {
+  if (o.originState !== 'CA') return false;
+  const city = (o.originCity || '').toLowerCase();
+  const addr = (o.originAddr || '').toLowerCase();
+  const isLongBeach = PORT_CITIES.some(p => city.includes(p) || addr.includes(p));
+  return isLongBeach && o.broker > 2000;
+}
+
+function scoreOrder(o) {
+  let score = 0;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // ── Detect special order types FIRST ──────────────────────────────────────
+  o.isPort    = isPortOrder(o);
+  // Prepaid: broker fee = customer price, not real margin — exclude from fee scoring
+  // Port: inflated port fee — cap contribution, don't let it dominate
+
+  // 1. BROKER FEE (0-40 pts)
+  // PREPAID → skip entirely (fee shown = customer total, not real broker margin)
+  // PORT    → cap at $500 equivalent so it doesn't unfairly dominate
+  if (!o.prepaid && !o.isPort) {
+    score += Math.min(40, (o.broker / 750) * 40);
+  } else if (o.isPort) {
+    // Use a realistic estimated margin ($300-400 typical on port jobs) not the inflated number
+    const cappedBroker = Math.min(o.broker, 500);
+    score += Math.min(40, (cappedBroker / 750) * 40);
+    o.portCapped = true;
+  }
+  // Prepaid gets 0 broker pts — ranked purely on everything else below
+
+  // 2. ORIGIN SNOW RISK (0-25 pts)
+  const risk = SNOW_RISK[o.originState] ?? 1;
+  score += [25, 18, 10, 0][risk];
+
+  // 3. PICKUP URGENCY (0-20 pts)
+  if (o.pickupDateObj) {
+    const daysOut = Math.floor((o.pickupDateObj - today) / 86400000);
+    if (daysOut <= 0) score += 20;
+    else if (daysOut === 1) score += 16;
+    else if (daysOut === 2) score += 12;
+    else if (daysOut === 3) score += 8;
+    else if (daysOut <= 5) score += 4;
+  }
+
+  // 4. LANE STRENGTH (0-20 pts)
+  o.laneScore = getLaneScore(o.originState, o.destState);
+  score += o.laneScore;
+
+  // 5. VEHICLE SIZE / TYPE (0-15 pts)
+  o.vehicleCategory = getVehicleCategory(o.vehicleType, o.vehicle);
+  o.vehicleSizeScore = VEHICLE_SIZE_SCORE[o.vehicleCategory] ?? 6;
+  score += o.vehicleSizeScore;
+
+  // 6. PREPAID BONUS (6 pts — still rewarded for being confirmed, just not fee-boosted)
+  if (o.prepaid) score += 6;
+
+  // 7. VEHICLE RUNS (5 pts)
+  if (o.runs) score += 5;
+
+  // 8. BROKER MARGIN % — only meaningful on non-prepaid, non-port orders
+  if (!o.prepaid && !o.isPort && o.total > 0) {
+    const margin = o.broker / o.total;
+    if (margin >= 0.5) score += 5;
+    else if (margin >= 0.35) score += 3;
+  }
+
+  // 9. AGE URGENCY BONUS — orders sitting on list too long get pushed up
+  //    Dispatcher must move stale orders before they age out entirely
+  score += ageBonus(o);
+
+  return Math.round(score);
+}
+
+function getTier(score) {
+  if (score >= 65) return 'A';
+  if (score >= 50) return 'B';
+  if (score >= 35) return 'C';
+  return 'D';
+}
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+function rankOrders() {
+  const text = document.getElementById('orderData').value;
+  if (!text.trim()) { alert('Please paste order data first.'); return; }
+
+  const parsed = parseOrders(text);
+  if (parsed.length === 0) {
+    alert('Could not parse any orders. Make sure you copied directly from Message Plane CRM Live Orders.');
+    return;
+  }
+
+  // ── Step 1: sync with memory BEFORE scoring so age bonus is available
+  const { enrichedOrders, dispatchedOrders: dispatched } = syncWithMemory(parsed);
+  dispatchedOrders = dispatched;
+
+  // ── Step 2: score (age bonus is now part of each order's .ageMinutes)
+  enrichedOrders.forEach(o => {
+    o.score = scoreOrder(o);
+    o.tier  = getTier(o.score);
+  });
+
+  // ── Step 3: sort and rank
+  enrichedOrders.sort((a,b) => b.score - a.score);
+  enrichedOrders.forEach((o,i) => o.rank = i+1);
+  allOrders = enrichedOrders;
+
+  // ── Step 4: build diff summary
+  const newCount      = allOrders.filter(o => o.memStatus === 'new').length;
+  const returningCount= allOrders.filter(o => ['returning','aging','stale','critical'].includes(o.memStatus)).length;
+  const staleCritCount= allOrders.filter(o => ['stale','critical'].includes(o.memStatus)).length;
+  lastSyncDiff = { newCount, returningCount, staleCritCount, dispatched: dispatched.length };
+
+  document.getElementById('lastRun').textContent = `Ranked ${allOrders.length} orders · ${new Date().toLocaleTimeString()}`;
+  document.getElementById('parseInfo').textContent = `${allOrders.length} orders parsed`;
+  document.getElementById('exportBtn').style.display = 'inline-block';
+
+  renderSyncPanel();
+  renderStats();
+  applyFilter();
+  renderDispatchedPanel();
+  document.getElementById('resultsWrap').style.display = 'block';
+  document.getElementById('resultsWrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderSyncPanel() {
+  const el = document.getElementById('syncPanel');
+  if (!el) return;
+  if (!lastSyncDiff) { el.style.display = 'none'; return; }
+
+  const { newCount, returningCount, staleCritCount, dispatched } = lastSyncDiff;
+  const mem = loadMemory();
+  const sessionCount = mem.sessions.length;
+
+  // Only show if there's meaningful diff data (2nd run or later)
+  if (sessionCount < 2 && dispatched === 0) {
+    el.innerHTML = `
+      <div class="sync-item sync-first">
+        <span class="sync-icon">📡</span>
+        <span><strong>Memory active.</strong> Paste updated orders again in a few hours — the tool will detect what moved and what didn't.</span>
+        <span class="sync-meta">${newCount} orders saved to memory</span>
+      </div>`;
+    el.style.display = 'block';
+    return;
+  }
+
+  let html = '<div class="sync-row">';
+
+  if (dispatched > 0) {
+    html += `<div class="sync-item sync-dispatched">
+      <span class="sync-icon">✅</span>
+      <div>
+        <strong>${dispatched} order${dispatched>1?'s':''} dispatched</strong>
+        <span class="sync-sub">Disappeared since last run — assumed picked up</span>
+      </div>
+      <span class="sync-meta sync-good">${dispatched} gone</span>
+    </div>`;
+  }
+
+  if (newCount > 0) {
+    html += `<div class="sync-item sync-new">
+      <span class="sync-icon">🆕</span>
+      <div>
+        <strong>${newCount} new order${newCount>1?'s':''}</strong>
+        <span class="sync-sub">Just appeared since last run</span>
+      </div>
+      <span class="sync-meta">${newCount} new</span>
+    </div>`;
+  }
+
+  if (staleCritCount > 0) {
+    html += `<div class="sync-item sync-stale">
+      <span class="sync-icon">⏰</span>
+      <div>
+        <strong>${staleCritCount} order${staleCritCount>1?'s':''} aging out</strong>
+        <span class="sync-sub">On list 4+ hours — dispatcher should prioritize now</span>
+      </div>
+      <span class="sync-meta sync-warn">${staleCritCount} stale</span>
+    </div>`;
+  }
+
+  if (returningCount > 0 && dispatched === 0 && newCount === 0) {
+    html += `<div class="sync-item sync-returning">
+      <span class="sync-icon">🔄</span>
+      <div>
+        <strong>${returningCount} order${returningCount>1?'s':''} still active</strong>
+        <span class="sync-sub">All continuing from previous run — no dispatches yet</span>
+      </div>
+    </div>`;
+  }
+
+  html += `<button class="sync-clear-btn" onclick="confirmClearMemory()">🗑 Clear Memory</button>`;
+  html += '</div>';
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+function renderDispatchedPanel() {
+  const el = document.getElementById('dispatchedPanel');
+  if (!el) return;
+
+  if (!dispatchedOrders || dispatchedOrders.length === 0) {
+    el.style.display = 'none';
+    return;
+  }
+
+  let html = `
+    <div class="dispatched-header" onclick="toggleDispatched()">
+      <span class="dispatched-title">✅ Dispatched This Session</span>
+      <span class="dispatched-count">${dispatchedOrders.length}</span>
+      <span class="dispatched-toggle" id="dispatchedToggle">▼ show</span>
+    </div>
+    <div id="dispatchedBody" style="display:none">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;opacity:0.7">
+      <thead><tr style="border-bottom:1px solid var(--border2)">
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Order</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Customer</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Vehicle</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Route</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Broker $</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Was Rank</th>
+        <th style="padding:8px 14px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Removed</th>
+      </tr></thead>
+      <tbody>`;
+
+  dispatchedOrders.sort((a,b) => (a.rank||99) - (b.rank||99)).forEach(o => {
+    html += `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)">${o.orderId}</td>
+      <td style="padding:8px 14px;color:var(--text2)">${o.customer||'—'}</td>
+      <td style="padding:8px 14px;color:var(--text3);font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.vehicle||'—'}</td>
+      <td style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${o.originState||'?'} → ${o.destState||'?'}</td>
+      <td style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;color:var(--green)">$${(o.broker||0).toLocaleString()}</td>
+      <td style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;color:var(--text3)">#${o.rank||'?'}</td>
+      <td style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${formatAge(o.minutesAgo||0)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+function toggleDispatched() {
+  const body = document.getElementById('dispatchedBody');
+  const toggle = document.getElementById('dispatchedToggle');
+  if (!body) return;
+  const visible = body.style.display !== 'none';
+  body.style.display = visible ? 'none' : 'block';
+  if (toggle) toggle.textContent = visible ? '▼ show' : '▲ hide';
+}
+
+function confirmClearMemory() {
+  if (confirm('Clear all memory? This resets all order history and age tracking.')) {
+    clearMemory();
+    lastSyncDiff = null;
+    dispatchedOrders = [];
+    renderSyncPanel();
+    renderDispatchedPanel();
+    // Re-render without memory statuses
+    allOrders.forEach(o => {
+      o.memStatus = null;
+      o.ageMinutes = 0;
+    });
+    applyFilter();
+  }
+}
+
+function renderStats() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const total = allOrders.length;
+  const tierA = allOrders.filter(o=>o.tier==='A').length;
+  const prepaid = allOrders.filter(o=>o.prepaid).length;
+  const totalBroker = allOrders.reduce((s,o)=>s+o.broker,0);
+  const urgentToday = allOrders.filter(o=>o.pickupDateObj && Math.floor((o.pickupDateObj-today)/86400000)<=0).length;
+
+  const portCount = allOrders.filter(o=>o.isPort).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-item"><span class="stat-val">${total}</span><span class="stat-label">Total Orders</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:var(--tier1)">${tierA}</span><span class="stat-label">Tier A Priority</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:var(--green)">$${totalBroker.toLocaleString()}</span><span class="stat-label">Total Broker $</span></div>
+    <div class="stat-item"><span class="stat-val" style="color:var(--green)">${prepaid}</span><span class="stat-label">Pre-Paid <span style="font-size:9px;opacity:0.6">(fee excluded)</span></span></div>
+    <div class="stat-item"><span class="stat-val" style="color:var(--accent)">${urgentToday}</span><span class="stat-label">Due Today</span></div>
+    ${portCount > 0 ? `<div class="stat-item"><span class="stat-val" style="color:#f97316">${portCount}</span><span class="stat-label">Port Orders <span style="font-size:9px;opacity:0.6">(fee capped)</span></span></div>` : ''}
+  `;
+}
+
+let activeFilter = 'all';
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let filtered = allOrders.filter(o => {
+    if (activeFilter === 'A' && o.tier !== 'A') return false;
+    if (activeFilter === 'B' && o.tier !== 'B') return false;
+    if (activeFilter === 'C' && o.tier !== 'C') return false;
+    if (activeFilter === 'prepaid' && !o.prepaid) return false;
+    if (activeFilter === 'stale' && !['stale','critical','aging'].includes(o.memStatus)) return false;
+    if (activeFilter === 'new' && o.memStatus !== 'new') return false;
+    if (activeFilter === 'urgent') {
+      const daysOut = o.pickupDateObj ? Math.floor((o.pickupDateObj-today)/86400000) : 99;
+      if (daysOut > 0) return false;
+    }
+    if (search) {
+      const haystack = `${o.orderId} ${o.customer} ${o.vehicle} ${o.originCity} ${o.destCity} ${o.originState} ${o.destState}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  renderTable(filtered);
+}
+
+function laneClass(s) {
+  if (s >= 16) return 'lane-hot';
+  if (s >= 11) return 'lane-warm';
+  if (s >= 6) return 'lane-cool';
+  return 'lane-cold';
+}
+
+function laneLabelStr(o) {
+  const ro = REGION[o.originState] || '?';
+  const rd = REGION[o.destState] || '?';
+  const labels = {'NE':'Northeast','SE':'Southeast','MW':'Midwest','TX':'South/TX','MT':'Mountain','WC':'West Coast'};
+  if (o.originState === o.destState) return 'Same State';
+  if (ro === rd) return 'Same Region';
+  return `${labels[ro]||ro} → ${labels[rd]||rd}`;
+}
+
+function vsizeClass(s) {
+  if (s >= 13) return 'vsize-high';
+  if (s >= 9) return 'vsize-med';
+  if (s >= 5) return 'vsize-low';
+  return 'vsize-spec';
+}
+
+function renderStatusCell(o) {
+  if (!o.memStatus || o.memStatus === 'returning') {
+    if (o.ageMinutes > 0) {
+      return `<span class="status-badge status-returning" title="On list for ${formatAge(o.ageMinutes)}">↺ ${formatAge(o.ageMinutes)}</span>`;
+    }
+    return `<span class="status-badge status-fresh">—</span>`;
+  }
+  switch(o.memStatus) {
+    case 'new':
+      return `<span class="status-badge status-new">✦ NEW</span>`;
+    case 'aging':
+      return `<span class="status-badge status-aging" title="${formatAge(o.ageMinutes)} on list">⏱ ${formatAge(o.ageMinutes)}</span>`;
+    case 'stale':
+      return `<span class="status-badge status-stale" title="${formatAge(o.ageMinutes)} on list — needs attention">⚠ ${formatAge(o.ageMinutes)}</span>`;
+    case 'critical':
+      return `<span class="status-badge status-critical" title="${formatAge(o.ageMinutes)} on list — critical">🔴 ${formatAge(o.ageMinutes)}</span>`;
+    default:
+      return `<span class="status-badge status-fresh">—</span>`;
+  }
+}
+
+function renderTable(orders) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const maxScore = allOrders.length > 0 ? allOrders[0].score : 100;
+  const tbody = document.getElementById('tableBody');
+
+  if (orders.length === 0) {
+    tbody.innerHTML = '';
+    document.getElementById('emptyFiltered').style.display = 'block';
+    document.getElementById('resultsCount').textContent = '0';
+    return;
+  }
+
+  document.getElementById('emptyFiltered').style.display = 'none';
+  document.getElementById('resultsCount').textContent = orders.length;
+
+  const risk = o => SNOW_RISK[o.originState] ?? 1;
+  const barPct = o => Math.round((o.score / maxScore) * 100);
+
+  const daysUntil = o => o.pickupDateObj ? Math.floor((o.pickupDateObj - today) / 86400000) : 99;
+
+  let html = '';
+  orders.forEach((o, i) => {
+    const d = daysUntil(o);
+    const pickupClass = d <= 0 ? 'pickup-urgent' : '';
+    const pickupLabel = d <= 0 ? `⚡ ${o.pickupDate}` : o.pickupDate || '—';
+    const isTop = o.rank <= 3;
+
+    const tags = [
+      o.prepaid  ? '<span class="tag tag-prepaid">PRE-PAID</span>' : '',
+      o.isPort   ? '<span class="tag tag-port">PORT</span>' : '',
+      o.enclosed ? '<span class="tag tag-enclosed">ENCLOSED</span>' : '',
+      !o.runs    ? '<span class="tag tag-nonrun">NO RUN</span>' : '',
+      d <= 0     ? '<span class="tag tag-urgent">TODAY</span>' : '',
+    ].join('');
+
+    html += `<tr class="${isTop ? 'top-order' : ''}">
+      <td class="rank-cell ${o.rank<=3 ? 'rank-'+o.rank : ''}">${o.rank}</td>
+      <td>${renderStatusCell(o)}</td>
+      <td><span class="tier-badge tier-${o.tier}">${o.tier}</span></td>
+      <td class="order-id">${o.orderId}</td>
+      <td>
+        <div class="customer-name">${o.customer || '—'}</div>
+      </td>
+      <td>
+        <div class="vehicle-info" title="${o.vehicle}">${o.vehicleType ? '['+o.vehicleType+'] ' : ''}${o.vehicle}</div>
+      </td>
+      <td class="route">${o.originCity || ''} <span class="state-tag ${SNOW_CLASS[risk(o)]}">${o.originState}</span></td>
+      <td><span class="state-tag ${SNOW_CLASS[risk(o)]}">${SNOW_LABEL[risk(o)]}</span></td>
+      <td class="route">${o.destCity || ''} <span style="color:var(--text3);font-size:10px">${o.destState}</span></td>
+      <td><span class="state-tag ${laneClass(o.laneScore)}">${laneLabelStr(o)}</span></td>
+      <td><span class="state-tag ${vsizeClass(o.vehicleSizeScore)}">${VEHICLE_SIZE_LABEL[o.vehicleCategory]||o.vehicleCategory}</span></td>
+      <td class="pickup-date ${pickupClass}">${pickupLabel}</td>
+      <td class="broker-fee">
+        ${o.prepaid
+          ? `<span style="color:var(--text3);font-size:10px;font-family:'IBM Plex Mono',monospace">$${o.broker.toLocaleString()} <span title="Fee excluded from ranking — prepaid orders show customer total, not broker margin" style="color:var(--accent);cursor:help">⊘</span></span>`
+          : o.isPort
+            ? `<span style="color:var(--text3);font-size:10px;font-family:'IBM Plex Mono',monospace">$${o.broker.toLocaleString()} <span title="Port fee — inflated, capped in ranking" style="color:#f97316;cursor:help">⚓</span></span>`
+            : `$${o.broker.toLocaleString()}`
+        }
+      </td>
+      <td class="total-fee">$${o.total.toLocaleString()}</td>
+      <td>${tags || '<span style="color:var(--text3);font-size:10px">—</span>'}</td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-bg"><div class="score-bar-fill" style="width:${barPct(o)}%"></div></div>
+          <span class="score-num">${o.score}</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function sortBy(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = col === 'rank' || col === 'score' || col === 'broker' ? 'desc' : 'asc';
+  }
+
+  const map = { rank:'rank', broker:'broker', total:'total', score:'score',
+                 customer:'customer', vehicle:'vehicle', origin:'originState',
+                 destination:'destState', pickup:'pickupDateObj', orderId:'orderId',
+                 lane:'laneScore', vehicleSize:'vehicleSizeScore' };
+  const field = map[col] || col;
+
+  allOrders.sort((a,b) => {
+    let va = a[field], vb = b[field];
+    if (va instanceof Date || va === null) {
+      va = va ? va.getTime() : 99999999;
+      vb = vb ? vb.getTime() : 99999999;
+    }
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // Update header indicators
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+
+  applyFilter();
+}
+
+function clearAll() {
+  document.getElementById('orderData').value = '';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('exportBtn').style.display = 'none';
+  document.getElementById('parseInfo').textContent = '';
+  document.getElementById('lastRun').textContent = 'No data loaded';
+  const sp = document.getElementById('syncPanel');
+  const dp = document.getElementById('dispatchedPanel');
+  if (sp) sp.style.display = 'none';
+  if (dp) dp.style.display = 'none';
+  allOrders = [];
+  dispatchedOrders = [];
+  lastSyncDiff = null;
+}
+
+function exportCSV() {
+  const cols = ['Rank','Tier','Score','OrderID','Customer','Vehicle','VehicleSize','OriginCity','OriginState','SnowRisk','DestCity','DestState','LaneStrength','LaneScore','PickupDate','Broker','Total','PrePaid','Enclosed','VehicleRuns'];
+  const rows = allOrders.map(o => [
+    o.rank, o.tier, o.score, o.orderId, `"${o.customer}"`, `"${o.vehicle}"`,
+    VEHICLE_SIZE_LABEL[o.vehicleCategory]||o.vehicleCategory,
+    `"${o.originCity}"`, o.originState, SNOW_LABEL[SNOW_RISK[o.originState]??1],
+    `"${o.destCity}"`, o.destState, laneLabelStr(o), o.laneScore,
+    o.pickupDate, o.broker, o.total, o.prepaid?'YES':'NO', o.enclosed?'YES':'NO', o.runs?'YES':'NO'
+  ].join(','));
+
+  const csv = [cols.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dispatch-priority-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// Allow Enter key shortcut
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') rankOrders();
+});
+</script>
+
 </body>
 </html>
