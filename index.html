@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BizNet Connect</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="dispatch-wizard.js" defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script>
     function navigateTo(section) {
@@ -140,7 +139,6 @@
       <li onclick="navigateTo('about')">About</li>
       <li onclick="navigateTo('pricing')">Pricing</li>
       <li onclick="navigateTo('contact')">Contact</li>
-      <li onclick="navigateTo('dispatch')" class="nav-dispatch">Dispatch</li>
     </ul>
   </nav>
 
@@ -226,27 +224,6 @@
         <textarea placeholder="Your Message" rows="5" style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;"></textarea>
         <button type="submit" class="cta-button">Send Message</button>
       </form>
-    </div>
-  </section>
-
-  <!-- Dispatch Wizard Terminal -->
-  <section id="dispatch" class="dispatch-section">
-    <div class="container">
-      <h2>Dispatch Wizard</h2>
-      <p>Browse services, choose a provider, and dispatch requests — all from the terminal.</p>
-      <div id="dispatch-terminal" class="terminal">
-        <div class="term-titlebar">
-          <span class="term-dot red"></span>
-          <span class="term-dot yellow"></span>
-          <span class="term-dot green"></span>
-          <span class="term-title">biznet — dispatch wizard</span>
-        </div>
-        <div class="term-output"></div>
-        <div class="term-input-row">
-          <span class="term-prompt">biznet></span>
-          <input class="term-input" type="text" autocomplete="off" spellcheck="false" autofocus placeholder="type help to get started">
-        </div>
-      </div>
     </div>
   </section>
 
