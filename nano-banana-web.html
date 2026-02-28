@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nano Banana Web</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4ed;
+    min-height: 100dvh;
+    padding: 1rem;
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+  .header {
+    text-align: center;
+    padding: 1rem 0 1.5rem;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    font-size: 0.8rem;
+    color: #8888a4;
+    margin-top: 0.25rem;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8888a4;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  input[type="text"], input[type="password"], textarea, select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #e4e4ed;
+    background: #16161f;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: #f59e0b;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888a4' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+  select option { background: #16161f; color: #e4e4ed; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .btn {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: #0a0a0f;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-secondary {
+    background: #16161f;
+    color: #e4e4ed;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+  .status {
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    color: #8888a4;
+    display: none;
+  }
+  .status.visible { display: block; }
+  .status.error { color: #f87171; }
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(251,191,36,0.3);
+    border-top-color: #fbbf24;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .result {
+    margin-top: 1rem;
+    display: none;
+  }
+  .result.visible { display: block; }
+  .result img {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .result-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .result-meta {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #55556a;
+    margin-top: 0.5rem;
+  }
+  .key-toggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #55556a;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+  }
+  .key-wrapper { position: relative; }
+  .history {
+    margin-top: 1.5rem;
+    display: none;
+  }
+  .history.visible { display: block; }
+  .history h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #55556a;
+    margin-bottom: 0.75rem;
+  }
+  .history-item {
+    background: #16161f;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .history-item img {
+    width: 100%;
+    display: block;
+  }
+  .history-item p {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    color: #8888a4;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Nano Banana Web</h1>
+  <p>Gemini image generation from your browser</p>
+</div>
+
+<div class="form-group">
+  <label>API Key</label>
+  <div class="key-wrapper">
+    <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off">
+    <button class="key-toggle" id="toggleKey" type="button">&#128065;</button>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>Prompt</label>
+  <textarea id="prompt" placeholder="a cute robot mascot with big eyes" rows="3"></textarea>
+</div>
+
+<div class="row" style="margin-bottom: 1rem;">
+  <div class="form-group" style="margin-bottom: 0;">
+    <label>Model</label>
+    <select id="model">
+      <option value="gemini-3.1-flash-image-preview">Flash (fast)</option>
+      <option value="gemini-3-pro-image-preview">Pro (quality)</option>
+    </select>
+  </div>
+  <div class="form-group" style="margin-bottom: 0;">
+    <label>Size</label>
+    <select id="size">
+      <option value="512px">512</option>
+      <option value="1K" selected>1K</option>
+      <option value="2K">2K</option>
+      <option value="4K">4K</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>Aspect Ratio</label>
+  <select id="aspect">
+    <option value="">Default (1:1)</option>
+    <option value="16:9">16:9 Widescreen</option>
+    <option value="9:16">9:16 Portrait</option>
+    <option value="4:3">4:3 Standard</option>
+    <option value="3:4">3:4 Portrait</option>
+    <option value="3:2">3:2 Photo</option>
+    <option value="2:3">2:3 Portrait Photo</option>
+    <option value="21:9">21:9 Ultra Wide</option>
+  </select>
+</div>
+
+<button class="btn" id="generateBtn" onclick="generate()">Generate Image</button>
+
+<div class="status" id="status"></div>
+
+<div class="result" id="result">
+  <img id="resultImg" src="" alt="Generated image">
+  <div class="result-actions">
+    <button class="btn btn-secondary" onclick="downloadImage()">Save Image</button>
+    <button class="btn btn-secondary" onclick="generateAnother()">New Image</button>
+  </div>
+  <div class="result-meta" id="resultMeta"></div>
+</div>
+
+<div class="history" id="history">
+  <h3>Recent Generations</h3>
+  <div id="historyList"></div>
+</div>
+
+<script>
+  // Restore saved API key
+  const savedKey = localStorage.getItem('nb_api_key');
+  if (savedKey) document.getElementById('apiKey').value = savedKey;
+
+  // Toggle key visibility
+  document.getElementById('toggleKey').addEventListener('click', function() {
+    const input = document.getElementById('apiKey');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+
+  let currentImageData = null;
+  let currentPromptText = '';
+
+  async function generate() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const prompt = document.getElementById('prompt').value.trim();
+    const model = document.getElementById('model').value;
+    const size = document.getElementById('size').value;
+    const aspect = document.getElementById('aspect').value;
+
+    if (!apiKey) { showStatus('Enter your Gemini API key', true); return; }
+    if (!prompt) { showStatus('Enter a prompt', true); return; }
+
+    // Save key
+    localStorage.setItem('nb_api_key', apiKey);
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    showStatus('<span class="spinner"></span> Generating image...', false);
+    document.getElementById('result').classList.remove('visible');
+
+    currentPromptText = prompt;
+
+    const imageConfig = { imageSize: size };
+    if (aspect) imageConfig.aspectRatio = aspect;
+
+    const body = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseModalities: ['IMAGE', 'TEXT'],
+        imageConfig: imageConfig
+      }
+    };
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    try {
+      const t0 = Date.now();
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+      const parts = data.candidates?.[0]?.content?.parts;
+      if (!parts) throw new Error('No content in response');
+
+      let imageFound = false;
+      let textResponse = '';
+
+      for (const part of parts) {
+        if (part.inlineData) {
+          const mime = part.inlineData.mimeType || 'image/png';
+          const b64 = part.inlineData.data;
+          const dataUrl = `data:${mime};base64,${b64}`;
+
+          currentImageData = { dataUrl, mime, b64 };
+
+          document.getElementById('resultImg').src = dataUrl;
+          document.getElementById('result').classList.add('visible');
+          document.getElementById('resultMeta').textContent =
+            `${model.includes('flash') ? 'Flash' : 'Pro'} · ${size} · ${elapsed}s`;
+
+          imageFound = true;
+          addToHistory(dataUrl, prompt);
+        }
+        if (part.text) {
+          textResponse += part.text;
+        }
+      }
+
+      if (!imageFound) {
+        throw new Error(textResponse || 'No image was generated. Try a different prompt.');
+      }
+
+      hideStatus();
+
+    } catch (err) {
+      let msg = err.message;
+      if (msg.length > 200) msg = msg.substring(0, 200) + '...';
+      showStatus(msg, true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Generate Image';
+    }
+  }
+
+  function downloadImage() {
+    if (!currentImageData) return;
+    const ext = currentImageData.mime.split('/')[1] || 'png';
+    const slug = currentPromptText.substring(0, 30).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+    const a = document.createElement('a');
+    a.href = currentImageData.dataUrl;
+    a.download = `nano-banana-${slug}.${ext}`;
+    a.click();
+  }
+
+  function generateAnother() {
+    document.getElementById('result').classList.remove('visible');
+    document.getElementById('prompt').focus();
+  }
+
+  function showStatus(html, isError) {
+    const el = document.getElementById('status');
+    el.innerHTML = html;
+    el.className = 'status visible' + (isError ? ' error' : '');
+  }
+
+  function hideStatus() {
+    document.getElementById('status').className = 'status';
+  }
+
+  // History (in-memory, last 10)
+  let historyItems = [];
+
+  function addToHistory(dataUrl, prompt) {
+    historyItems.unshift({ dataUrl, prompt });
+    if (historyItems.length > 10) historyItems.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (historyItems.length < 2) {
+      document.getElementById('history').classList.remove('visible');
+      return;
+    }
+    document.getElementById('history').classList.add('visible');
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    // Skip first (it's the current image)
+    for (let i = 1; i < historyItems.length; i++) {
+      const item = historyItems[i];
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `<img src="${item.dataUrl}" alt="${item.prompt}" loading="lazy"><p>${item.prompt}</p>`;
+      list.appendChild(div);
+    }
+  }
+
+  // Allow Ctrl+Enter / Cmd+Enter to generate
+  document.getElementById('prompt').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      generate();
+    }
+  });
+</script>
+
+</body>
+</html>
