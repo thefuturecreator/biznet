@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DW Asset Generator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0b0d12;
+    color: #f1f3f9;
+    min-height: 100dvh;
+    padding: 1rem;
+    padding-bottom: calc(env(safe-area-inset-bottom, 1rem) + 2rem);
+  }
+  .header {
+    text-align: center;
+    padding: 1rem 0 1.25rem;
+  }
+  .header h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    font-size: 0.75rem;
+    color: #8b8fa8;
+    margin-top: 0.25rem;
+  }
+
+  /* API Key */
+  .key-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .key-bar input {
+    flex: 1;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: #f1f3f9;
+    background: #141620;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    outline: none;
+  }
+  .key-bar input:focus { border-color: #6366f1; }
+  .key-bar button {
+    padding: 0.65rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* Batch controls */
+  .batch-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .batch-bar button {
+    flex: 1;
+    padding: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .batch-bar button:active { transform: scale(0.98); }
+  .batch-bar button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-gen-all {
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+  }
+  .btn-dl-all {
+    color: #f1f3f9;
+    background: #141620;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    height: 4px;
+    background: #141620;
+    border-radius: 2px;
+    margin-bottom: 1.25rem;
+    display: none;
+  }
+  .progress-wrap.visible { display: block; }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* Asset cards */
+  .card {
+    background: #141620;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-header h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .card-badges {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge-size {
+    background: rgba(99,102,241,0.15);
+    color: #818cf8;
+  }
+  .badge-aspect {
+    background: rgba(168,85,247,0.15);
+    color: #c084fc;
+  }
+  .badge-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #374151;
+    flex-shrink: 0;
+  }
+  .badge-status.done { background: #10b981; }
+  .badge-status.running {
+    background: #f59e0b;
+    animation: pulse 1s infinite;
+  }
+  .badge-status.error { background: #ef4444; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .card-body {
+    display: none;
+    padding: 0 1rem 1rem;
+  }
+  .card.open .card-body { display: block; }
+
+  .card-body textarea {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: #f1f3f9;
+    background: #0b0d12;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+  .card-body textarea:focus { border-color: #6366f1; }
+
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  .card-actions button {
+    flex: 1;
+    padding: 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-actions button:active { transform: scale(0.97); }
+  .card-actions button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-card-gen {
+    color: #fff;
+    background: #6366f1;
+  }
+  .btn-card-dl {
+    color: #f1f3f9;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .card-preview {
+    margin-top: 0.75rem;
+    display: none;
+  }
+  .card-preview.visible { display: block; }
+  .card-preview img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .card-preview .meta {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #55556a;
+    margin-top: 0.4rem;
+  }
+
+  .global-status {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8b8fa8;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .global-status.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>DW Asset Generator</h1>
+  <p>Enterprise UI mockups via Nano Banana 2</p>
+</div>
+
+<div class="key-bar">
+  <input type="password" id="apiKey" placeholder="Gemini API key" autocomplete="off">
+  <button onclick="saveKey()">Save</button>
+</div>
+
+<div class="batch-bar">
+  <button class="btn-gen-all" id="genAllBtn" onclick="generateAll()">Generate All (10)</button>
+  <button class="btn-dl-all" id="dlAllBtn" onclick="downloadAll()" disabled>Download All</button>
+</div>
+
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="global-status" id="globalStatus"></div>
+
+<div id="cardContainer"></div>
+
+<script>
+const ASSETS = [
+  {
+    id: 'dw-logo',
+    name: 'Logo Mark',
+    aspect: '1:1',
+    size: '1K',
+    prompt: `Minimal geometric logomark for an enterprise AI dispatch platform called Dispatch Wizard. Abstract shape formed by combining a diamond gem facet with directional arrow pathways, suggesting intelligence and routing. Rendered in a precise indigo-to-violet gradient (#4F46E5 to #7C3AED) on pure white background. Single color mark, no text, no realistic elements. Inspired by Linear and Vercel logo design language. Crisp edges, mathematically precise geometry, silicon valley tech aesthetic. Square composition with generous negative space.`
+  },
+  {
+    id: 'dw-dashboard',
+    name: 'Main Dashboard',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Enterprise SaaS analytics dashboard, dark theme UI screenshot. Top: slim 56px header bar with small logo left, breadcrumb navigation center, avatar and notification bell right. Below header: row of 6 KPI metric cards with large bold numbers, subtle sparkline graphs, percentage change badges in green and red. Main content: full-width data table with 14 columns, alternating row shading, first column has colored tier badges (gold, emerald, blue, gray), score column has horizontal progress bars, status column has pill badges with dot indicators. Left edge: slim 64px icon-only sidebar with 6 nav icons, active state highlighted in indigo. Color palette: backgrounds #0B0D12 and #141620, accent indigo #6366F1, text #F1F3F9 and #8B8FA8. Font: Inter. Pixel-perfect, production-ready feel like Linear.app or Vercel dashboard. 16:9 aspect ratio.`
+  },
+  {
+    id: 'dw-stats',
+    name: 'Stats Cards',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Close-up UI design of 6 enterprise analytics cards in a 3x2 grid, dark theme. Each card: rounded 16px corners, subtle 1px border rgba(255,255,255,0.06), background #141620. Inside each card: top-left has 32px icon in a soft colored circle (indigo, emerald, amber, blue, red, purple), top-right has a delta badge showing +12% in green or -3% in red. Center: large 28px bold white number. Bottom: small gray label text and a 48px wide micro area chart in the accent color with gradient fill fading to transparent. Cards for: 2,847 Total Orders — 342 Tier A — $186K Broker Rev — 89 Pre-Paid — 67 Due Today — 23 Port Orders. Figma-quality precision, 1px details, Inter font. 16:9.`
+  },
+  {
+    id: 'dw-table',
+    name: 'Priority Table',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Enterprise data table UI component, dark theme, extreme detail. Table header row: uppercase 10px labels in muted gray, subtle bottom border. Data rows alternate between #141620 and #1A1D2A. Columns visible: rank number with circle badge, tier letter in colored pill (A=amber, B=emerald, C=blue, D=gray), order ID in monospace, customer name, vehicle type with small icon, origin→destination with arrow, pickup date, broker fee in green, score shown as number plus horizontal bar chart filling proportionally. Top 3 rows have a soft indigo left border glow. Row hover state shown on one row with lighter background. Scrollbar styled thin. Pixel-perfect table design like Stripe Dashboard or Railway.app. Dark background #0B0D12. 16:9 widescreen.`
+  },
+  {
+    id: 'dw-filters',
+    name: 'Filter Bar',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Horizontal filter toolbar UI component, dark theme, isolated on dark background. Left side: row of pill-shaped toggle buttons with labels All, Tier A, Tier B, Tier C, Pre-Paid, Aging, New, Today. Active buttons have indigo background #6366F1 with white text, inactive have transparent background with gray border and muted text. Right side: search input with magnifying glass icon, rounded corners, subtle inner shadow, placeholder text "Search orders..." in muted gray. Below the bar: thin horizontal divider line. Clean spacing 8px between pills. Height 48px total. Matches Linear.app filter bar aesthetic. Dark background #0B0D12. 16:9 wide format.`
+  },
+  {
+    id: 'dw-paste-zone',
+    name: 'Paste Zone',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Enterprise UI card component for data input, dark theme. Large card with 20px border radius, background #141620, 1px border rgba(255,255,255,0.06). Top section: heading "Import Orders" with clipboard icon, subtitle "Paste live CRM data to rank and prioritize" in muted text. Center: code-editor-style textarea with line numbers on left margin, dark inner background #0B0D12, monospace font, showing sample pasted order data with syntax highlighting. Bottom bar: three action buttons — primary "Rank Orders" button with lightning icon in indigo gradient with glow shadow, secondary "Clear" ghost button, tertiary "Export CSV" button with download icon in emerald. Small text showing "47 orders parsed" with green checkmark. Inspired by Vercel's deployment interface. 16:9.`
+  },
+  {
+    id: 'dw-sync-panel',
+    name: 'Sync Panel',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Enterprise notification panel UI, dark theme. Horizontal card layout showing 5 status cards in a row. Each card has: large emoji icon at top (checkmark, sparkle, clock, alert, satellite), bold count number, descriptive label below. Cards for: "12 Dispatched" in green tint, "8 New Orders" in blue tint, "5 Aging" in amber tint, "3 Critical" in red tint, "47 Active" in indigo tint. Each card has its accent color as a subtle background tint and left border. Below cards: timeline showing recent order events with timestamps. "Clear Memory" danger button bottom-right, ghost style with red hover state. Background #141620, 1px borders. 16:9.`
+  },
+  {
+    id: 'dw-mobile',
+    name: 'Mobile View',
+    aspect: '9:16',
+    size: '2K',
+    prompt: `iPhone 15 Pro mockup showing a freight dispatch ranking app, dark UI. Dynamic Island visible at top. Screen shows: compact header with "DW" logo mark and hamburger menu. Below: horizontally scrollable stat pills showing key numbers. Main area: stacked order cards instead of table — each card shows order ID bold top-left, tier badge top-right (colored pill), customer name, vehicle description, origin city → destination city with arrow, pickup date, and score bar at bottom. Cards have 12px rounded corners, subtle borders, slight elevation. Bottom: iOS-style tab bar with 5 icons (dashboard, orders, analytics, alerts, settings). Active tab highlighted in indigo. Dark background matching desktop palette. 9:16 portrait.`
+  },
+  {
+    id: 'dw-icons',
+    name: 'Icon Set',
+    aspect: '1:1',
+    size: '1K',
+    prompt: `Set of 8 UI icons for an enterprise dispatch SaaS, arranged in 2x4 grid on pure black background. Icons: lightning bolt (priority ranking), snowflake (weather risk), route with pins (lane strength), stopwatch (time urgency), truck front-view (vehicle type), dollar in circle (pricing), brain with circuits (AI scoring), bar chart ascending (analytics). Each icon: 2px stroke weight, rounded caps and joins, rendered in a single indigo-to-cyan gradient (#6366F1 to #06B6D4). Consistent 64px canvas with 8px padding. Geometric precision, Phosphor Icons or Lucide style. No fills, outline only.`
+  },
+  {
+    id: 'dw-hero',
+    name: 'Hero Section',
+    aspect: '16:9',
+    size: '2K',
+    prompt: `Website hero section for dispatchwizard.ai, dark premium design. Left side: large headline "AI-Powered Dispatch Priority Ranking" in white bold Inter font, subtitle paragraph in gray, two CTA buttons (primary indigo gradient "Start Ranking", secondary outline "Watch Demo"). Right side: floating 3D-perspective screenshot of the dashboard UI, tilted 5 degrees with reflection shadow beneath, glowing indigo ambient light behind it. Background: deep navy #0B0D12 with subtle radial gradient glow in indigo/purple center. Floating abstract geometric shapes (low opacity) in background. Premium SaaS landing page style like Linear.app or Raycast.com. 16:9.`
+  }
+];
+
+// State
+const state = {};
+ASSETS.forEach(a => {
+  state[a.id] = { imageData: null, status: 'idle', prompt: a.prompt };
+});
+
+// Restore key
+const savedKey = localStorage.getItem('nb_api_key');
+if (savedKey) document.getElementById('apiKey').value = savedKey;
+
+function saveKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (key) {
+    localStorage.setItem('nb_api_key', key);
+    document.getElementById('apiKey').type = 'text';
+    setTimeout(() => { document.getElementById('apiKey').type = 'password'; }, 800);
+  }
+}
+
+function getKey() {
+  return document.getElementById('apiKey').value.trim();
+}
+
+// Render cards
+function renderCards() {
+  const container = document.getElementById('cardContainer');
+  container.innerHTML = '';
+  ASSETS.forEach(asset => {
+    const s = state[asset.id];
+    const statusClass = s.status === 'done' ? 'done' : s.status === 'running' ? 'running' : s.status === 'error' ? 'error' : '';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${asset.id}`;
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${asset.id}')">
+        <h3>${asset.name}</h3>
+        <div class="card-badges">
+          <span class="badge badge-size">${asset.size}</span>
+          <span class="badge badge-aspect">${asset.aspect}</span>
+          <span class="badge-status ${statusClass}"></span>
+        </div>
+      </div>
+      <div class="card-body">
+        <textarea id="prompt-${asset.id}" rows="4">${s.prompt}</textarea>
+        <div class="card-actions">
+          <button class="btn-card-gen" id="genbtn-${asset.id}" onclick="generateOne('${asset.id}')">Generate</button>
+          <button class="btn-card-dl" id="dlbtn-${asset.id}" onclick="downloadOne('${asset.id}')" ${s.imageData ? '' : 'disabled'}>Download</button>
+        </div>
+        <div class="card-preview ${s.imageData ? 'visible' : ''}" id="preview-${asset.id}">
+          ${s.imageData ? `<img src="${s.imageData.dataUrl}" alt="${asset.name}">` : ''}
+          ${s.imageData ? `<div class="meta">${s.imageData.meta}</div>` : ''}
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleCard(id) {
+  const card = document.getElementById(`card-${id}`);
+  card.classList.toggle('open');
+}
+
+function updateCardStatus(id, status) {
+  state[id].status = status;
+  const card = document.getElementById(`card-${id}`);
+  const dot = card.querySelector('.badge-status');
+  dot.className = 'badge-status ' + (status === 'done' ? 'done' : status === 'running' ? 'running' : status === 'error' ? 'error' : '');
+}
+
+function showPreview(id, dataUrl, meta) {
+  state[id].imageData = { dataUrl, meta };
+  const preview = document.getElementById(`preview-${id}`);
+  preview.innerHTML = `<img src="${dataUrl}" alt="${id}"><div class="meta">${meta}</div>`;
+  preview.classList.add('visible');
+  document.getElementById(`dlbtn-${id}`).disabled = false;
+}
+
+// Generate one asset
+async function generateOne(id) {
+  const key = getKey();
+  if (!key) { alert('Enter your Gemini API key'); return; }
+
+  const asset = ASSETS.find(a => a.id === id);
+  const prompt = document.getElementById(`prompt-${id}`).value.trim();
+  state[id].prompt = prompt;
+
+  const btn = document.getElementById(`genbtn-${id}`);
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  updateCardStatus(id, 'running');
+
+  // Open the card to show progress
+  document.getElementById(`card-${id}`).classList.add('open');
+
+  try {
+    const result = await callGemini(key, prompt, asset.size, asset.aspect);
+    showPreview(id, result.dataUrl, result.meta);
+    updateCardStatus(id, 'done');
+  } catch (err) {
+    updateCardStatus(id, 'error');
+    alert(`${asset.name} failed: ${err.message.substring(0, 150)}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generate';
+  }
+
+  updateDlAllBtn();
+}
+
+// Generate all
+async function generateAll() {
+  const key = getKey();
+  if (!key) { alert('Enter your Gemini API key'); return; }
+
+  const genBtn = document.getElementById('genAllBtn');
+  genBtn.disabled = true;
+  genBtn.textContent = 'Generating...';
+
+  const wrap = document.getElementById('progressWrap');
+  const bar = document.getElementById('progressBar');
+  wrap.classList.add('visible');
+  bar.style.width = '0%';
+
+  const statusEl = document.getElementById('globalStatus');
+  statusEl.classList.add('visible');
+
+  let done = 0;
+  const total = ASSETS.length;
+
+  // Run up to 3 at a time to avoid rate limits
+  const queue = [...ASSETS];
+  const workers = [];
+  const concurrency = 3;
+
+  async function worker() {
+    while (queue.length > 0) {
+      const asset = queue.shift();
+      const id = asset.id;
+      const prompt = document.getElementById(`prompt-${id}`)?.value.trim() || state[id].prompt;
+      state[id].prompt = prompt;
+
+      updateCardStatus(id, 'running');
+      statusEl.textContent = `Generating ${done + 1}/${total}: ${asset.name}...`;
+
+      try {
+        const result = await callGemini(key, prompt, asset.size, asset.aspect);
+        showPreview(id, result.dataUrl, result.meta);
+        updateCardStatus(id, 'done');
+      } catch (err) {
+        updateCardStatus(id, 'error');
+        console.error(`${asset.name} failed:`, err);
+      }
+
+      done++;
+      bar.style.width = `${(done / total) * 100}%`;
+    }
+  }
+
+  for (let i = 0; i < concurrency; i++) {
+    workers.push(worker());
+  }
+  await Promise.all(workers);
+
+  const successCount = ASSETS.filter(a => state[a.id].status === 'done').length;
+  statusEl.textContent = `Done! ${successCount}/${total} generated.`;
+  genBtn.disabled = false;
+  genBtn.textContent = 'Generate All (10)';
+  updateDlAllBtn();
+}
+
+// Gemini API call
+async function callGemini(apiKey, prompt, size, aspect) {
+  const model = 'gemini-3.1-flash-image-preview';
+  const imageConfig = { imageSize: size };
+  if (aspect) imageConfig.aspectRatio = aspect;
+
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: {
+      responseModalities: ['IMAGE', 'TEXT'],
+      imageConfig
+    }
+  };
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const t0 = Date.now();
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+
+  const data = await res.json();
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  const parts = data.candidates?.[0]?.content?.parts;
+  if (!parts) throw new Error('No content in response');
+
+  for (const part of parts) {
+    if (part.inlineData) {
+      const mime = part.inlineData.mimeType || 'image/png';
+      const b64 = part.inlineData.data;
+      const dataUrl = `data:${mime};base64,${b64}`;
+      return { dataUrl, mime, b64, meta: `Flash 3.1 · ${size} · ${aspect || '1:1'} · ${elapsed}s` };
+    }
+  }
+
+  const textParts = parts.filter(p => p.text).map(p => p.text).join(' ');
+  throw new Error(textParts || 'No image generated');
+}
+
+// Download one
+function downloadOne(id) {
+  const s = state[id];
+  if (!s.imageData) return;
+  const a = document.createElement('a');
+  a.href = s.imageData.dataUrl;
+  a.download = `${id}.png`;
+  a.click();
+}
+
+// Download all
+function downloadAll() {
+  ASSETS.forEach(asset => {
+    if (state[asset.id].imageData) {
+      const a = document.createElement('a');
+      a.href = state[asset.id].imageData.dataUrl;
+      a.download = `${asset.id}.png`;
+      a.click();
+    }
+  });
+}
+
+function updateDlAllBtn() {
+  const anyDone = ASSETS.some(a => state[a.id].imageData);
+  document.getElementById('dlAllBtn').disabled = !anyDone;
+}
+
+// Init
+renderCards();
+</script>
+</body>
+</html>
